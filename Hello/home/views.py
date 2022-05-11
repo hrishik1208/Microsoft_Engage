@@ -87,15 +87,15 @@ def cam(request):
         
         # recognition part
        
-        img1=cv2.imread('media/H1.jpg')
-        img2=cv2.imread('media/Frame0.jpg')
-        rgb_img1=cv2.cvtColor(img1,cv2.COLOR_BGR2RGB)
-        img1_encoding=face_recognition.face_encodings(rgb_img1)[0]
+        # img1=cv2.imread('media/H1.jpg')
+        # img2=cv2.imread('media/Frame0.jpg')
+        # rgb_img1=cv2.cvtColor(img1,cv2.COLOR_BGR2RGB)
+        # img1_encoding=face_recognition.face_encodings(rgb_img1)[0]
 
-        rgb_img2=cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
-        img2_encoding=face_recognition.face_encodings(rgb_img2)[0]
+        # rgb_img2=cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
+        # img2_encoding=face_recognition.face_encodings(rgb_img2)[0]
 
-        result = face_recognition.compare_faces([img1_encoding],img2_encoding)
+        # result = face_recognition.compare_faces([img1_encoding],img2_encoding)
 
 
         # saving image to model part

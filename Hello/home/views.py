@@ -103,6 +103,6 @@ def cam(request):
         # con=Mains(name="kah",img='Frame0.jpg')
         # con.save()
         # print(request.user.username)
-        return HttpResponse(result)
+        return HttpResponse()
 
     return render(request,'cam.html')

@@ -4,49 +4,82 @@ from django.shortcuts import render, HttpResponse, redirect
 from datetime import datetime
 from home.models import contact
 from home.models import Mains
+from home.models import Teacher_reg
+from home.models import Student_reg
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
 import cv2
 import face_recognition
 
-def index(request):
-    context={
-        "var1":67,
-        "var2":1777
-    }
-    return render(request, 'index.html',context)
-
-def about(request): 
-    if(request.method == "POST"):
-        name=request.POST.get('name')
-        email=request.POST.get('email')
+def index(request): 
+    if(request.method=="POST"):
+        d=dict()
+        username=request.POST.get('username')
         password=request.POST.get('password')
-        con=contact(name=name,email=email,password=password)
-        con.save()
-        return HttpResponse("Data submitted")
-    return HttpResponse("This is about Page")
-
-def services(request):
-    return HttpResponse("This is services Page")
-
-def register(request):
-    if(request.method=='POST'):
-        print("this is printed")
-        name=request.POST.get('username')
-        email=request.POST.get('email')
-        password=request.POST.get('password')
-        fname=request.POST.get('fname')
-        lname=request.POST.get('lname')    
-        if User.objects.filter(username=name).exists():
-            return HttpResponse("failed")
+        if User.objects.filter(username=username).exists() == False:
+            return render(request,'err.html')
+        c=User.objects.get(username=username)
+        D=c.password
+        print(D)
+        print(password)
+        if(D != password):
+            return render(request,'err.html')
+        if Teacher_reg.objects.filter(username=username).exists():
+            d["name"]=str(c.first_name)
+            if c is not None:
+                auth.login(request,c)
+            return render(request,'teach_page.html',d)
         else:
-            user=User(username=name,email=email,password=password,first_name=fname,last_name=lname)
+            d["name"]=str(c.first_name)
+            if c is not None:
+                auth.login(request,c)
+            return render(request,'stu_page.html',d)
+        
+    return render(request,'Register_login.html')
+
+def teach(request):
+    if(request.method=="POST"):
+        d=dict()
+        name=request.POST.get('name')
+        username=request.POST.get('username')
+        email=request.POST.get('email')
+        password=request.POST.get('password')
+        if User.objects.filter(username=username).exists():
+            return render(request,'err.html')
+        else:
+            con=Teacher_reg(name=name,email=email,username=username,password=password)
+            con.save()
+            user=User(username=username,email=email,password=password,first_name=name,last_name=name)
             user.save()
             if user is not None:
                 auth.login(request,user)
-                return HttpResponse("regishi")
+        d["name"]=name
+        return render(request,'teach_page.html',d)
+    
+    else:
+        return render(request,'err.html')
 
-    return render(request, 'ss.html')
+def stu(request): 
+    if(request.method=="POST"):
+        d=dict()
+        name=request.POST.get('name')
+        username=request.POST.get('username')
+        email=request.POST.get('email')
+        password=request.POST.get('password')
+        if User.objects.filter(username=username).exists():
+            return render(request,'err.html')
+        else:
+            con=Student_reg(name=name,email=email,username=username,password=password)
+            con.save()
+            user=User(username=username,email=email,password=password,first_name=name,last_name=name)
+            user.save()
+            if user is not None:
+                auth.login(request,user)
+        d["name"]=name
+        return render(request,'stu_page.html',d)
+    else:
+        return render(request,'err.html')
+
 
 def run():
     cap = cv2.VideoCapture(0)

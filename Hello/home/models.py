@@ -15,6 +15,27 @@ class contact(models.Model):
 
     def __str__(self):
         return self.name
+class Teacher_reg(models.Model):
+    name=models.CharField(max_length=100,default="kshh")
+    username=models.CharField(max_length=100,default="kshh")
+    email=models.CharField(max_length=100)
+    password=models.CharField(max_length=100)
+    # date=models.DateField()
+    # check=models.CharField()
+
+    def __str__(self):
+        return self.name
+
+class Student_reg(models.Model):
+    name=models.CharField(max_length=100)
+    username=models.CharField(max_length=100)
+    email=models.CharField(max_length=100)
+    password=models.CharField(max_length=100)
+    # date=models.DateField()
+    # check=models.CharField()
+
+    def __str__(self):
+        return self.name
 
 class Mains(models.Model):
     name=models.CharField(max_length=100,default="kshh")

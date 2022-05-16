@@ -19,6 +19,11 @@
     </style>
 </head>
 <body>
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    <strong>Message : </strong> {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>{% endfor %}
     <div class="container-fluid">
         <div style="height: 150px;" class="row" >
           <div class="container">

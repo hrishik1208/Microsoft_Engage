@@ -47,76 +47,13 @@
         </div>
     </nav>
 </div>
-{% for message in  messages %}
+{% for message in    messages %}
 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
   <strong>Message : </strong> {{ message }}
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>{% endfor %}
 <br>
 
-<hr>
-{% if sign == 1 %}
-<center><h2>Live attendance Published</h2></center><br>
-<div style="margin-right:10%;" class="container">
-  <div style="border: 2px solid black;" class="row">
-    <div class="col-4">
-      <img style="margin-left:-3%" width="50%" height="100%" src="static/course.jpg" alt="">
-    </div>
-    <div class="col-6">
-      <h4 style="margin-top:4%;">Course : {{ final1.course_name }}</h4>
-    </div>
-    <div id="har" class="col-2">
-      <h3 style="margin-top:10%;" id="val">{{ final1.time_future }}</h3> 
-    </div>
-  </div>
-</div>
-{% endif %}
-<script> 
-  var i = document.getElementById('val').innerHTML; 
-  console.log(i); 
-  document.getElementById("val").innerHTML = ""; 
-  var x=setInterval(function(){ 
-  var now =new Date().getTime();
-  var diff=i-now;
-  diff = diff / 1000 ;
-  var num=Math.floor(diff/60);
-  var str=num.toString();
-  if (num<0){
-    str="0";
-  }
-  
-  var num1 = Math.floor(diff % 60);
-  var str1=num1.toString();
-  if(num1 <0 ){
-    str1="0";
-  }
-  var fin=str.concat(" : ",str1);
-  document.getElementById("val").innerHTML = fin;
-  console.log(fin);
-  if (num <=0 && num1<=0){
-    location.href = "/student_page";
-  }
-}, 1000 )
-</script>
-<hr>
-<hr>
-<br><center><hr><h2 style="font-style:italic;"><u>Your Registered Courses</u></h2></center><br>
-<div class="container">
-    <div class="row">
-      {% for i in list  %}
-        <div style="padding:30px;" class="col-md-4 col-sm-6">
-        <div class="card" style="width: 18rem;">
-            <center>
-            <div class="card-body">
-              <h5 class="card-title">{{ i.course_name }} </h5>
-              <p class="card-text" name="coursename">Instr. {{ i.t_name }}</p>
-            </div></center>
-        </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-<hr>
 
 
 

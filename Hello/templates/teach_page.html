@@ -76,7 +76,9 @@
       <h4 style="margin-top:4%;">Course : {{ active.course_name }}</h4>
     </div>
     <div id="har" class="col-2">
-      <h3 style="margin-top:10%;" id="val">{{ active.time_future }}</h3> 
+      <h3 style="margin-top:5%;" id="val">{{ active.time_future }}</h3> 
+      <form action="/teacher_page" method="POST">{% csrf_token %}
+      <button style="width:70%" name="hari" class="btn-danger" value="{{ active.course_name }}" >Stop</button></form>
       <script> 
         var i = document.getElementById('val').innerHTML; 
         console.log(i); 

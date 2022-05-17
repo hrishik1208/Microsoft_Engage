@@ -77,21 +77,27 @@ def teach(request):
         return redirect('/')
 
     if(request.method=="POST"):
-        name=request.POST.get('name')
-        username=request.POST.get('username')
-        email=request.POST.get('email')
-        password=request.POST.get('password')
-        if User.objects.filter(username=username).exists():
-            messages.error(request,"Account with the username already exists")
-            return redirect('/')
-        else: 
-            con=Teacher_reg(name=name,email=email,username=username,password=password)
-            con.save()
-            user=User(username=username,email=email,password=password,first_name=name,last_name=name)
-            user.save() 
-            if user is not None: 
-                messages.success(request,"Registered Succsessfully") 
-                auth.login(request,user) 
+        if len(request.user.username) !=0:
+            abcd=request.POST.get("hari")
+            print(abcd)
+            ob=Live.objects.filter(username=request.user.username,course_name=abcd)
+            ob.delete()
+        else:
+            name=request.POST.get('name')
+            username=request.POST.get('username')
+            email=request.POST.get('email')
+            password=request.POST.get('password')
+            if User.objects.filter(username=username).exists():
+                messages.error(request,"Account with the username already exists")
+                return redirect('/')
+            else:
+                con=Teacher_reg(name=name,email=email,username=username,password=password)
+                con.save()
+                user=User(username=username,email=email,password=password,first_name=name,last_name=name)
+                user.save() 
+                if user is not None: 
+                    messages.success(request,"Registered Succsessfully") 
+                    auth.login(request,user) 
 
     active=Live.objects.filter(username=request.user.username)
     comments = Course_str.objects.filter(username=request.user.username)

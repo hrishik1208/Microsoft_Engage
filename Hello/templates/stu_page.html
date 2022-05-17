@@ -52,6 +52,7 @@
 <br>
 <hr>
 {% if sign == 1 %}
+
 <center><h2>Live attendance Published</h2></center><br>
 <div style="margin-right:10%;" class="container">
   <div style="border: 2px solid black;" class="row">
@@ -62,10 +63,15 @@
       <h4 style="margin-top:4%;">Course : {{ final1.course_name }}</h4>
     </div>
     <div id="har" class="col-2">
-      <h3 style="margin-top:10%;" id="val">{{ final1.time_future }}</h3> 
+      <h3 style="margin-top:7%;" id="val">{{ final1.time_future }}</h3> 
+      <form action="/student_page" method="POST">
+        {% csrf_token %}
+        <button value="{{ final1.username }},{{ final1.course_name }},{{ final1.time_present }}" name="krish" class="btn-success">Mark</button>
+      </form>
     </div>
   </div>
 </div>
+
 {% endif %}
 <script> 
   var i = document.getElementById('val').innerHTML; 

@@ -9,6 +9,7 @@ from home.models import Live
 from home.models import Course_str
 from home.models import Non_approved
 from home.models import Approved
+from home.models import Student_attendace_report
 # Register your models here.
 admin.site.register(contact)
 admin.site.register(Mains)
@@ -19,3 +20,4 @@ admin.site.register(Live)
 admin.site.register(Course_str)
 admin.site.register(Non_approved)
 admin.site.register(Approved)
+admin.site.register(Student_attendace_report)

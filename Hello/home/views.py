@@ -16,10 +16,12 @@ from home.models import Live
 from home.models import Course_str
 from home.models import Non_approved
 from home.models import Approved
+from home.models import Student_attendace_report
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
 import cv2
 import face_recognition
+import simplejson as json
 import time
 def index(request): 
     curr=request.user
@@ -155,12 +157,13 @@ def course(request):
         else :
             a=round(time.time() * 1000)
             print(a)
+            b=a
             a=a+((Time*60)*1000)
-            m1=Live(username=request.user.username,course_name=c_name,time_future=a,attended_list="")
-            m1.save()
             hi=datetime.date.today()
+            m1=Live(username=request.user.username,course_name=c_name,time_future=a,attended_list="",date=hi,time_present=b)
+            m1.save()
             gi=0
-            m2=Course_str(username=request.user.username,course_name=c_name,date=hi,attended_list="")
+            m2=Course_str(username=request.user.username,course_name=c_name,date=hi,time_present=b,attended_list="")
             m2.save()
             messages.success(request,"Attendance Published ")
 
@@ -288,26 +291,57 @@ def stu(request):
     
     d=dict()
     if(request.method=="POST"):
-        
-        name=request.POST.get('name')
-        username=request.POST.get('username')
-        email=request.POST.get('email')
-        password=request.POST.get('password')
-        if User.objects.filter(username=username).exists():
-            messages.error(request,"Account with the username already exists")
-            return redirect('/')
-        else:
-            con=Student_reg(name=name,email=email,username=username,password=password)
-            con.save()
-            user=User(username=username,email=email,password=password,first_name=name,last_name=name)
-            user.save()
-            if user is not None:
-                auth.login(request,user)
-                messages.success(request,"Registered Successfully")
-        d["name"]=name 
-        return render(request,'stu_page.html',d) 
+        if len(request.user.username) !=0:  
+            hi=request.POST.get("krish")   
+            print(hi)
+            hi=hi.split(',')
+            objectt=Student_attendace_report.objects.filter(t_username=hi[0],s_username=request.user.username,course_name=hi[1],bool=0,time_present=int(hi[2]))
+            objectt1=Student_attendace_report.objects.filter(t_username=hi[0],s_username=request.user.username,course_name=hi[1],bool=1,time_present=int(hi[2]))
+            if len(objectt1) !=0:
+                messages.success(request,"Attendance is already Marked")
+            else:
+                objectf=Student_attendace_report(t_username=objectt[0].t_username,s_username=request.user.username,course_name=objectt[0].course_name,date=objectt[0].date,bool=1,time_present=objectt[0].time_present)
+                objectf.save()
+                target=Course_str.objects.filter(username= objectt[0].t_username,course_name=objectt[0].course_name,time_present=int(hi[2]))
+                jsonDec = json.decoder.JSONDecoder()
+                myPythonList =(target[0].attended_list)
+               
+                if(myPythonList==""):
+                    myPythonList=str(request.user.email)
 
-    g=Live.objects.filter()
+                elif request.user.email not in myPythonList:
+                    myPythonList+="!!!!"+str(request.user.email)
+
+                print(str(myPythonList))
+                # df=str(myPythonList)
+                # target[0].attended_list=df
+                tarhj=Course_str(username=target[0].username,course_name=target[0].course_name,date=target[0].date,time_present=target[0].time_present,attended_list=myPythonList)
+                tarhj.save()
+                target[0].delete()
+                messages.success(request,"Attendance Marked ")
+                objectt[0].delete()
+        else:
+            name=request.POST.get('name')
+            username=request.POST.get('username')
+            email=request.POST.get('email')
+            password=request.POST.get('password')
+            if User.objects.filter(username=username).exists():
+                messages.error(request,"Account with the username already exists")
+                return redirect('/')
+            else:
+                con=Student_reg(name=name,email=email,username=username,password=password)
+                con.save()
+                user=User(username=username,email=email,password=password,first_name=name,last_name=name)
+                user.save()
+                if user is not None:
+                    auth.login(request,user)
+                    messages.success(request,"Registered Successfully")
+
+
+
+    a=round(time.time() * 1000)
+    g=Live.objects.exclude(time_future__lt=a)
+
     # print("lenght ",len(g))
     g1=Approved.objects.filter(s_username=request.user.username)
     final1=[]
@@ -332,17 +366,24 @@ def stu(request):
         return redirect('/')
     f=request.user.first_name 
     list=Approved.objects.filter(s_username=request.user.username)
-    a=round(time.time() * 1000)
+    
     print("lenght ",len(final1))
     sign=1
-    for i in range(0,len(final1)):
-        if final1[i].time_future <=a :
-            d=final1[i]
-            d.delete()
+    for i in final1:
+        ob1=Student_attendace_report.objects.filter(t_username=i.username,s_username=request.user.username,course_name=i.course_name,date=i.date,bool=1,time_present=i.time_present)
+        ob2=Student_attendace_report.objects.filter(t_username=i.username,s_username=request.user.username,course_name=i.course_name,date=i.date,bool=0,time_present=i.time_present)
+        if len(ob1) !=0 :
+            continue
+        elif len(ob2) !=0:
+            continue
+        else:
+            ob1=Student_attendace_report(t_username=i.username,s_username=request.user.username,course_name=i.course_name,date=i.date,bool=0,time_present=i.time_present)
+            ob1.save()
+        
 
-    d["final"]=[]
-    if len(final1)==0:
+    if len(final1) ==0:
         sign=0
+        d["final"]=[]
     else:
         d["final1"]=final1[0]
         

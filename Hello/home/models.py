@@ -52,10 +52,14 @@ class Live(models.Model):
     username=models.CharField(max_length=100)
     course_name=models.CharField(max_length=100)
     time_future=models.IntegerField()
+    time_present=models.IntegerField(default=0)
     attended_list=models.TextField(null=True)
+    date=models.DateField(default="2021-10-10")
     # date=models.DateField()
     # check=models.CharField()
-    
+    class Meta:
+        ordering = ('date',)
+
     def __str__(self):
         return self.course_name
 
@@ -63,8 +67,8 @@ class Course_str(models.Model):
     username=models.CharField(max_length=100)
     course_name=models.CharField(max_length=100)
     date=models.DateField(default="2021-10-10")
+    time_present=models.IntegerField(default=0)
     attended_list=models.TextField(null=True)
-    
     class Meta:
         ordering = ('date',)
     
@@ -81,6 +85,9 @@ class Non_approved(models.Model):
     img=models.ImageField(null=True,blank=True)
     join_code=models.IntegerField()
 
+    def __str__(self):
+        return self.course_name
+
 class Approved(models.Model):
     t_username=models.CharField(max_length=100)
     t_name=models.CharField(max_length=100)
@@ -91,6 +98,23 @@ class Approved(models.Model):
     img=models.ImageField(null=True,blank=True)
     join_code=models.IntegerField()
 
+    def __str__(self):
+        return self.course_name
+
+
+class Student_attendace_report(models.Model):
+    t_username=models.CharField(max_length=100)
+    s_username=models.CharField(max_length=100)
+    course_name=models.CharField(max_length=100)
+    date=models.DateField(default="2021-10-10")
+    bool=models.IntegerField(default=0)
+    time_present=models.IntegerField()
+
+    class Meta:
+        ordering = ('date',)
+
+    def __str__(self):
+        return self.course_name
 
 class Mains(models.Model):
     name=models.CharField(max_length=100,default="kshh")

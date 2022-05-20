@@ -19,13 +19,18 @@ from home.models import Course_str
 from home.models import Non_approved
 from home.models import Approved
 from home.models import Student_attendace_report
+from home.models import recognize
+from home.models import Join
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
+from cvzone.HandTrackingModule import HandDetector
+from cvzone.FaceDetectionModule import FaceDetector
 import cv2
+import cvzone
 import numpy as np
 import face_recognition
 import time
-from cvzone.HandTrackingModule import HandDetector
+
 from django.http.response import StreamingHttpResponse
 import glob
 import numpy as np
@@ -300,8 +305,7 @@ def stu(request):
     d=dict()
     if(request.method=="POST"):
         if len(request.user.username) !=0:  
-            global If_posted
-            If_posted=True
+            
             hi=request.POST.get("krish")   
             print(hi)
             hi=hi.split(',')
@@ -310,12 +314,19 @@ def stu(request):
             if len(objectt1) !=0:
                 messages.success(request,"Attendance is already Marked")
             else:
+                global If_posted
+                If_posted=True
                 global Response_charge
                 count=0
-                while Response_charge == False:
+                val1=recognize(username=request.user.username,If_posted=1,Response_charge=0)
+                val1.save()
+                val=recognize.objects.filter(username=request.user.username)
+                while val[0].Response_charge == 0:
+                    val=recognize.objects.filter(username=request.user.username)
                     count+=1
 
-                Response_charge=False
+                val1=recognize(username=val[0].username,If_posted=0,Response_charge=0)
+                val1.save()
 
                 img1=cv2.imread('media/'+request.user.username+'_imageno_0.jpg')
                 # img1=cv2.imread('media/H.jpg')
@@ -323,6 +334,9 @@ def stu(request):
                 img1_encoding=face_recognition.face_encodings(rgb_img1)[0]
                 img2=cv2.imread('media/'+request.user.username+'trial.jpg')
                 rgb_img2=cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
+                if( len(face_recognition.face_encodings(rgb_img2)) ==0):
+                    messages.error(request,"Please Try Again")
+                    return redirect('/student_page')
                 img2_encoding=face_recognition.face_encodings(rgb_img2)[0]
                 result = face_recognition.compare_faces([img1_encoding],img2_encoding)
 
@@ -354,6 +368,10 @@ def stu(request):
             username=request.POST.get('username')
             email=request.POST.get('email')
             password=request.POST.get('password')
+            val=recognize(username=username,If_posted=0,Response_charge=0)
+            val.save()
+            val1=Join(username=username,bool=0)
+            val1.save()
             if User.objects.filter(username=username).exists():
                 messages.error(request,"Account with the username already exists")
                 return redirect('/')
@@ -460,13 +478,27 @@ def join(request):
             return redirect('/')
         else:
             print(g)
+            count=0
+            val1=Join(username=request.user.username,If_posted=1,Response_charge=0)
+            val1.save()
+            val=Join.objects.filter(username=request.user.username)
+            while val[0].Response_charge == 0:
+                val=Join.objects.filter(username=request.user.username)
+                count+=1
+
+            val1=Join(username=val[0].username,If_posted=0,Response_charge=0)
+            val1.save()
+
             li=Teacher_reg.objects.filter(username=g[0].username)
             li2=Student_reg.objects.filter(username=request.user.username)
             # run(str(request.user.username)+str(li[0].username))
             # print("This ihiowhuowhon",str(request.user.username)+str(li[0].username)+".jpg")
             st = request.user.username+'_imageno_'
-            if os.path.exists('media/'+st+str(0)+'.jpg') == False:
-                messages.error(request,"No Human Face detected")
+            img2=cv2.imread('media/'+request.user.username+'_imageno_'+str(0)+'.jpg')
+            rgb_img2=cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
+            if( len(face_recognition.face_encodings(rgb_img2)) ==0):
+                messages.error(request,"Please Try Again")
+                return redirect('/')
 
             else:
 
@@ -540,6 +572,7 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter('media/output.avi', fourcc, 20.0, (640, 480))
 detector = cv2.CascadeClassifier(r'haarcascade_frontalface_default.xml')
 hand_cascade=cv2.CascadeClassifier(r'aGest.xml')
+detectorf = FaceDetector()
 def gen(request):
     video = cv2.VideoCapture(0)
     accept=True
@@ -549,26 +582,27 @@ def gen(request):
         if success== False:
             continue
         frame_flip = cv2.flip(image,1)
-        
+        img, bboxs = detectorf.findFaces(frame_flip)
         gray=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2GRAY)
         all_faces = detector.detectMultiScale(gray,1.5,5)
-        hands=hand_cascade.detectMultiScale(gray,1.5,5)
-        if len(all_faces)>0:
+        
+        if len(bboxs)==1:
+            center = bboxs[0]["center"]
             for face in all_faces:
-                x,y,w,h = face 
+                x,y,w,h = all_faces[0]
                 rgb_img1=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2RGB)
-                if accept == True and len(face_recognition.face_encodings(rgb_img1)) >0 :
+                val=Join.objects.filter(username=request.user.username)
+                if val[0].If_posted == 1 and len(face_recognition.face_encodings(rgb_img1)) >0 :
                     cv2.imwrite('media/'+str(request.user.username)+'_imageno_'+str(0)+'.jpg', frame_flip)
-                    accept=False
+                    val1=Join(username=val[0].username,If_posted=0,Response_charge=1)
+                    val1.save()
 
-                cv2.rectangle(frame_flip, (x, y), (x+w,y+h), (0, 0, 255), 2)
-            cv2.putText(frame_flip,'Face detected',(330, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 128,0),2,cv2.LINE_AA)
+        elif len(bboxs)>1:
+            pass
+
         else:
             cv2.putText(frame_flip,'No face detected',(10, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
         
-        if len(hands) >0:
-            for (x,y,w,h) in hands:
-                cv2.rectangle(frame_flip,(x,y),(x+w,y+h),(0,0,255),2)
             # cv2.putText(frame_flip,'No face detected',(10, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
 
         ret, jpeg = cv2.imencode('.jpg', frame_flip)
@@ -591,25 +625,54 @@ def gen1(request):
         if success== False:
             continue
         frame_flip = cv2.flip(image,1)
-        hands,img=detectorh.findHands(image)
+        hands=detectorh.findHands(frame_flip,draw=False)
+        img, bboxs = detectorf.findFaces(frame_flip)
+
+        # gray=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2GRAY)
+        # all_faces = detector.detectMultiScale(gray,1.5,5)
+
+        # if len(all_faces)>0:
+        #     for face in all_faces:
+        #         x,y,w,h = face
+        #         rgb_img1=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2RGB)
+        #         global If_posted
+        #         global Response_charge
+        #         if If_posted == True and len(face_recognition.face_encodings(rgb_img1)) >0 :
+        #             cv2.imwrite('media/'+str(request.user.username)+'trial.jpg', frame_flip)
+        #             If_posted=False
+        #             Response_charge=True
+
+        #         cv2.rectangle(frame_flip, (x, y), (x+w,y+h), (0, 0, 255), 2)
+        #     cv2.putText(frame_flip,'Face detected',(330, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 128,0),2,cv2.LINE_AA)
+        # else:
+        #     cv2.putText(frame_flip,'No Face detected',(10, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
+        
+        if hands:
+            x,y,w,h = hands[0]['bbox']
+            cvzone.putTextRect(frame_flip,'',(x,y))
+            cv2.rectangle(frame_flip, (x, y), (x+w,y+h), (255, 0, 255), 2)
+
+        else:
+            cv2.putText(frame_flip,'No Hands detected',(10, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
+        
         gray=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2GRAY)
         all_faces = detector.detectMultiScale(gray,1.5,5)
-       
-        if len(all_faces)>0:
+        if len(bboxs)==1:
+            center = bboxs[0]["center"]
             for face in all_faces:
-                x,y,w,h = face
+                x,y,w,h = all_faces[0]
+                val=recognize.objects.filter(username=request.user.username)
                 rgb_img1=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2RGB)
                 global If_posted
                 global Response_charge
-                if If_posted == True and len(face_recognition.face_encodings(rgb_img1)) >0 :
+                if val[0].If_posted == 1 and len(face_recognition.face_encodings(rgb_img1)) >0 and len(hands)>0 :
                     cv2.imwrite('media/'+str(request.user.username)+'trial.jpg', frame_flip)
-                    If_posted=False
-                    Response_charge=True
-
-                cv2.rectangle(frame_flip, (x, y), (x+w,y+h), (0, 0, 255), 2)
-            cv2.putText(frame_flip,'Face detected',(330, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 128,0),2,cv2.LINE_AA)
+                    val1=recognize(username=val[0].username,If_posted=0,Response_charge=1)
+                    val1.save()
+        elif len(bboxs)>1:
+            pass
         else:
-            cv2.putText(frame_flip,'No Face detected',(10, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
+            cv2.putText(frame_flip,'No Face detected',(350, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
 
         ret, jpeg = cv2.imencode('.jpg', frame_flip)
         frame = jpeg.tobytes()
@@ -618,4 +681,5 @@ def gen1(request):
 
 def video_feed_1(request):
     return StreamingHttpResponse(gen1(request),content_type='multipart/x-mixed-replace; boundary=frame')
+
 

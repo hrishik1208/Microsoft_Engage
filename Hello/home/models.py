@@ -1,3 +1,4 @@
+from pyexpat import model
 from tkinter import Image
 from unicodedata import name
 from django.db import models
@@ -115,6 +116,16 @@ class Student_attendace_report(models.Model):
 
     def __str__(self):
         return self.course_name
+
+class Join(models.Model):
+    username=models.CharField(max_length=100,primary_key=True)
+    If_posted=models.IntegerField(default=0)
+    Response_charge=models.IntegerField(default=0)
+
+class recognize(models.Model):
+    username=models.CharField(max_length=100,primary_key=True)
+    If_posted=models.IntegerField(default=0)
+    Response_charge=models.IntegerField(default=0)
 
 class Mains(models.Model):
     name=models.CharField(max_length=100,default="kshh")

@@ -1,4 +1,5 @@
 from io import SEEK_END
+from operator import imod
 from pickle import TRUE
 from re import S
 from reprlib import aRepr
@@ -7,6 +8,7 @@ from cv2 import idct
 from django.shortcuts import render, HttpResponse, redirect
 from time import gmtime, strftime
 import datetime
+import os
 from home.models import contact
 from home.models import Mains
 from home.models import Teacher_reg
@@ -20,9 +22,14 @@ from home.models import Student_attendace_report
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
 import cv2
+import numpy as np
 import face_recognition
-import simplejson as json
 import time
+from cvzone.HandTrackingModule import HandDetector
+from django.http.response import StreamingHttpResponse
+import glob
+import numpy as np
+
 def index(request): 
     curr=request.user
     d=dict() 
@@ -286,12 +293,15 @@ def run(username):
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
+If_posted=False
+Response_charge=False
 def stu(request): 
     
     d=dict()
     if(request.method=="POST"):
         if len(request.user.username) !=0:  
+            global If_posted
+            If_posted=True
             hi=request.POST.get("krish")   
             print(hi)
             hi=hi.split(',')
@@ -300,26 +310,45 @@ def stu(request):
             if len(objectt1) !=0:
                 messages.success(request,"Attendance is already Marked")
             else:
-                objectf=Student_attendace_report(t_username=objectt[0].t_username,s_username=request.user.username,course_name=objectt[0].course_name,date=objectt[0].date,bool=1,time_present=objectt[0].time_present)
-                objectf.save()
-                target=Course_str.objects.filter(username= objectt[0].t_username,course_name=objectt[0].course_name,time_present=int(hi[2]))
-                jsonDec = json.decoder.JSONDecoder()
-                myPythonList =(target[0].attended_list)
-               
-                if(myPythonList==""):
-                    myPythonList=str(request.user.email)
+                global Response_charge
+                count=0
+                while Response_charge == False:
+                    count+=1
 
-                elif request.user.email not in myPythonList:
-                    myPythonList+="!!!!"+str(request.user.email)
+                Response_charge=False
 
-                print(str(myPythonList))
-                # df=str(myPythonList)
-                # target[0].attended_list=df
-                tarhj=Course_str(username=target[0].username,course_name=target[0].course_name,date=target[0].date,time_present=target[0].time_present,attended_list=myPythonList)
-                tarhj.save()
-                target[0].delete()
-                messages.success(request,"Attendance Marked ")
-                objectt[0].delete()
+                img1=cv2.imread('media/'+request.user.username+'_imageno_0.jpg')
+                # img1=cv2.imread('media/H.jpg')
+                rgb_img1=cv2.cvtColor(img1,cv2.COLOR_BGR2RGB)
+                img1_encoding=face_recognition.face_encodings(rgb_img1)[0]
+                img2=cv2.imread('media/'+request.user.username+'trial.jpg')
+                rgb_img2=cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
+                img2_encoding=face_recognition.face_encodings(rgb_img2)[0]
+                result = face_recognition.compare_faces([img1_encoding],img2_encoding)
+
+                if result[0] == True:
+                    
+                    objectf=Student_attendace_report(t_username=objectt[0].t_username,s_username=request.user.username,course_name=objectt[0].course_name,date=objectt[0].date,bool=1,time_present=objectt[0].time_present)
+                    objectf.save()
+                    target=Course_str.objects.filter(username= objectt[0].t_username,course_name=objectt[0].course_name,time_present=int(hi[2]))
+                    myPythonList =(target[0].attended_list)
+                    
+                    if(myPythonList==""):
+                        myPythonList=str(request.user.email)
+
+                    elif request.user.email not in myPythonList:
+                        myPythonList+="!!!!"+str(request.user.email)
+                    
+                    tarhj=Course_str(username=target[0].username,course_name=target[0].course_name,date=target[0].date,time_present=target[0].time_present,attended_list=myPythonList)
+                    tarhj.save()
+                    target[0].delete()
+                    objectt[0].delete()
+                    messages.success(request,"Attendance Marked Successfully")
+                    return redirect('/student_page')
+                else:
+                    messages.error(request,"Face Not matched. Please Mark Again")
+                    return redirect('/student_page')
+                
         else:
             name=request.POST.get('name')
             username=request.POST.get('username')
@@ -394,13 +423,24 @@ def stu(request):
     d["sign"]=sign
     return render(request,'stu_page.html',d)
 
+processing_imageno=0
+processing_imagenofake=0
+
+
 def join(request):
     if(len(request.user.username)==0):
         return redirect('/')
 
     if Student_reg.objects.filter(username=request.user.username).exists() == False :
         return redirect('/')
-        
+
+    video = cv2.VideoCapture(0)
+    # if os.path.exists('media/H1.jpg'):
+    #     print("Yes file is there")
+    global processing_imageno
+    processing_imageno=0
+    global processing_imagenofake
+    processing_imagenofake=0
     d=dict()
     if request.method=="POST":
         c_name=request.POST.get('coursename')
@@ -422,11 +462,17 @@ def join(request):
             print(g)
             li=Teacher_reg.objects.filter(username=g[0].username)
             li2=Student_reg.objects.filter(username=request.user.username)
-            run(str(request.user.username)+str(li[0].username))
-            print("This ihiowhuowhon",str(request.user.username)+str(li[0].username)+".jpg")
-            con=Non_approved(t_username=li[0].username,t_name=li[0].name,s_username=request.user.username,s_email=li2[0].email,s_id=id,course_name=c_name,img=str(request.user.username)+str(li[0].username)+".jpg",join_code=code)
-            con.save()
-            messages.success(request,"Request sent to respective Instructor Successfully ")
+            # run(str(request.user.username)+str(li[0].username))
+            # print("This ihiowhuowhon",str(request.user.username)+str(li[0].username)+".jpg")
+            st = request.user.username+'_imageno_'
+            if os.path.exists('media/'+st+str(0)+'.jpg') == False:
+                messages.error(request,"No Human Face detected")
+
+            else:
+
+                con=Non_approved(t_username=li[0].username,t_name=li[0].name,s_username=request.user.username,s_email=li2[0].email,s_id=id,course_name=c_name,img=st+str(0)+'.jpg',join_code=code)
+                con.save()
+                messages.success(request,"Request sent to respective Instructor Successfully ")
             return redirect('/')
 
     d["name"]=request.user.first_name
@@ -468,10 +514,8 @@ def cam(request):
         # img2=cv2.imread('media/Frame0.jpg')
         # rgb_img1=cv2.cvtColor(img1,cv2.COLOR_BGR2RGB)
         # img1_encoding=face_recognition.face_encodings(rgb_img1)[0]
-
         # rgb_img2=cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
         # img2_encoding=face_recognition.face_encodings(rgb_img2)[0]
-
         # result = face_recognition.compare_faces([img1_encoding],img2_encoding)
 
 
@@ -491,5 +535,87 @@ def logout(request):
     return redirect('/')
 
   
-    
-    
+
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter('media/output.avi', fourcc, 20.0, (640, 480))
+detector = cv2.CascadeClassifier(r'haarcascade_frontalface_default.xml')
+hand_cascade=cv2.CascadeClassifier(r'aGest.xml')
+def gen(request):
+    video = cv2.VideoCapture(0)
+    accept=True
+    count=0
+    while True:
+        success, image = video.read()
+        if success== False:
+            continue
+        frame_flip = cv2.flip(image,1)
+        
+        gray=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2GRAY)
+        all_faces = detector.detectMultiScale(gray,1.5,5)
+        hands=hand_cascade.detectMultiScale(gray,1.5,5)
+        if len(all_faces)>0:
+            for face in all_faces:
+                x,y,w,h = face 
+                rgb_img1=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2RGB)
+                if accept == True and len(face_recognition.face_encodings(rgb_img1)) >0 :
+                    cv2.imwrite('media/'+str(request.user.username)+'_imageno_'+str(0)+'.jpg', frame_flip)
+                    accept=False
+
+                cv2.rectangle(frame_flip, (x, y), (x+w,y+h), (0, 0, 255), 2)
+            cv2.putText(frame_flip,'Face detected',(330, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 128,0),2,cv2.LINE_AA)
+        else:
+            cv2.putText(frame_flip,'No face detected',(10, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
+        
+        if len(hands) >0:
+            for (x,y,w,h) in hands:
+                cv2.rectangle(frame_flip,(x,y),(x+w,y+h),(0,0,255),2)
+            # cv2.putText(frame_flip,'No face detected',(10, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
+
+        ret, jpeg = cv2.imencode('.jpg', frame_flip)
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+
+def video_feed(request):
+    return StreamingHttpResponse(gen(request),content_type='multipart/x-mixed-replace; boundary=frame')
+
+detectorh=HandDetector(detectionCon=0.8, maxHands=1)
+
+def gen1(request):
+    video = cv2.VideoCapture(0)
+    accept=True
+    count=0
+    while True:
+        success, image = video.read()
+        if success== False:
+            continue
+        frame_flip = cv2.flip(image,1)
+        hands,img=detectorh.findHands(image)
+        gray=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2GRAY)
+        all_faces = detector.detectMultiScale(gray,1.5,5)
+       
+        if len(all_faces)>0:
+            for face in all_faces:
+                x,y,w,h = face
+                rgb_img1=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2RGB)
+                global If_posted
+                global Response_charge
+                if If_posted == True and len(face_recognition.face_encodings(rgb_img1)) >0 :
+                    cv2.imwrite('media/'+str(request.user.username)+'trial.jpg', frame_flip)
+                    If_posted=False
+                    Response_charge=True
+
+                cv2.rectangle(frame_flip, (x, y), (x+w,y+h), (0, 0, 255), 2)
+            cv2.putText(frame_flip,'Face detected',(330, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 128,0),2,cv2.LINE_AA)
+        else:
+            cv2.putText(frame_flip,'No Face detected',(10, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
+
+        ret, jpeg = cv2.imencode('.jpg', frame_flip)
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+def video_feed_1(request):
+    return StreamingHttpResponse(gen1(request),content_type='multipart/x-mixed-replace; boundary=frame')
+

@@ -76,7 +76,7 @@
                </td>
                <td>{{ i.s_username }}</td>
                <td>{{ i.s_id }}</td>
-               <td><a href="/media/{{i.s_username}}{{i.t_username}}.jpg">img</a></td>
+               <td><a href="/media/{{i.img}}">img</a></td>
                <td>
                  <form action="/Request" method="POST">
                    {% csrf_token %}<button type="submit" class="btn-success" value="{{ i.s_username }},{{ i.course_name }},{{ i.s_id }},{{ i.s_email }},{{ i.join_code }}" name="hari" >Accept</button></form></td>

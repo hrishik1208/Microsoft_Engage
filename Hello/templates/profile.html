@@ -54,7 +54,37 @@
 </div>{% endfor %}
 <br>
 
+<div class="container">
+  {% for i in final_list_of_courses %}
+    <div class="row">
+      <hr>
+      <div class="container">
+        Date : {{ i.first.date }}
+      </div>
 
+      <div style="border: 2px solid black;" class="row">
+        
+        <div class="col-3">
+          <img style="margin-left:-3%" width="50%" height="100%" src="static/course.jpg" alt="">
+        </div>
+        <div class="col-6">
+          <h4 style="margin-top:4%;">Course : {{ i.first.course_name }}</h4>
+        </div>
+        <div class="col-3">
+          {% if i.second == 1 %}
+          <h4 style="margin-top:4%;">Attended  </h4>
+
+          {% else %}
+
+          <h4 style="margin-top:4%;">Unattended </h4>
+          {% endif %}
+          
+        </div>
+      </div>
+    </div>
+    <br>
+  {% endfor %}
+</div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>

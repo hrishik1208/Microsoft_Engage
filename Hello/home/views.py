@@ -243,7 +243,14 @@ def insights(request):
     if Teacher_reg.objects.filter(username=request.user.username).exists() == False :
         return redirect('/')
     d=dict()
+    data=Course_str.objects.filter(username=request.user.username)
     d["name"]=request.user.first_name
+    data1=[]
+    for i in data:
+        data1.append(i)
+    
+    data1.reverse()
+    d["data"]=data1
     return render(request,'insights.html',d)
 
 def Request(request):
@@ -286,6 +293,52 @@ def Request(request):
     d["listt"]=listt
     return render(request,'request.html',d)
 
+
+def details(request):
+    if(len(request.user.username)==0):
+        return redirect('/')
+
+    if Teacher_reg.objects.filter(username=request.user.username).exists() == False :
+        return redirect('/')
+
+    if request.method=="POST":
+        
+        present_time=request.POST.get('detail')
+        object=Course_str.objects.filter(username=request.user.username,time_present=int(present_time))
+        final_attended=[]
+        final_unattended=[]
+        given=object[0].attended_list
+        given=given.split("!!!!")
+        data=Approved.objects.filter(t_username=request.user.username,course_name=object[0].course_name)
+        for i in data:
+            student_email=i.s_email
+            student_id=i.s_id
+            obb=Student_reg.objects.filter(email=student_email)
+            student_name=obb[0].name
+            if student_email in given:
+                dictionary=dict()
+                dictionary["name"]=student_name
+                dictionary["email"]=student_email
+                dictionary["id"]=student_id
+                final_attended.append(dictionary)
+            else:
+                dictionary=dict()
+                dictionary["name"]=student_name
+                dictionary["email"]=student_email
+                dictionary["id"]=student_id
+                final_unattended.append(dictionary)
+
+        d=dict()
+        d["name"]=request.user.first_name
+        d["final_attended"]=final_attended
+        d["final_unattended"]=final_unattended
+        d["course"]=object[0].course_name
+        d["date"]=object[0].date
+        d["No_of_attended"]=len(final_attended)
+        d["No_of_unattended"]=len(final_unattended)
+
+        return render(request,'detail.html',d)
+    return redirect('/insights')
 
 def run(username):
     cap = cv2.VideoCapture(0)
@@ -565,9 +618,24 @@ def profile(request):
     d["name"]=request.user.first_name
     all_attend=Course_str.objects.filter()
     list_of_my_Courses=[]
+    final_list_of_courses=[]
     for i in range(0,len(all_attend)):
         object=all_attend[i]
-        
+        object1=Approved.objects.filter(s_username=request.user.username,course_name=object.course_name,t_username=object.username)
+        if len(object1)>0:
+            dictionary=dict()
+            dictionary["first"]=object
+            given=object.attended_list
+            given=given.split("!!!!")
+            if request.user.email in given:
+                dictionary["second"]=1
+            else:
+                dictionary["second"]=0
+            
+            final_list_of_courses.append(dictionary)
+    
+    final_list_of_courses.reverse()
+    d["final_list_of_courses"]=final_list_of_courses
     return render(request,'profile.html',d)
 
 

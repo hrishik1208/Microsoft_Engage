@@ -75,7 +75,7 @@ class Course_str(models.Model):
     time_present=models.IntegerField(default=0)
     attended_list=models.TextField(null=True)
     class Meta:
-        ordering = ('date',)
+        ordering = ('time_present',)
     
     def __str__(self):
         return self.course_name
@@ -116,7 +116,7 @@ class Student_attendace_report(models.Model):
     time_present=models.IntegerField()
 
     class Meta:
-        ordering = ('date',)
+        ordering = ('time_present',)
 
     def __str__(self):
         return self.course_name

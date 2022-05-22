@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Teacher's Page</title>
+</head>
+<body>
+    
+
+
+<div>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#4E5460;position: relative;">
+        <div >
+          <!-- <a class="navbar-brand" href="#">Navbar</a> -->
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div style="font-size: 20px;padding-left: 40px;" class="collapse navbar-collapse" id="navbarNav">
+            <center>
+            <ul class="navbar-nav" style="">
+                
+                <li class="nav-item">
+                  <a style="font-size: 20px;padding-left: 40px;color: white;" class="nav-link active" aria-current="page" href="#"><div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                      Hi Instr. {{ name }}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <form method="POST" action="/logout">
+                        {% csrf_token %}
+                        <button class="form-control btn-primary" type="submit">Logout</button>
+                    </form></div>
+                  </div></a>
+                  </li>
+              <li class="nav-item">
+                <a style="font-size: 20px;padding-left: 40px;color: white;margin-left:60px;" class="nav-link active light" aria-current="page" href="/">Home</a>
+              </li>
+              <li class="nav-item">
+                <a style="font-size: 20px;margin-left: 60px;color: white;" class="nav-link" href="">Courses</a>
+              </li>
+              <li class="nav-item">
+                <a style="font-size: 20px;margin-left: 60px;color: white;" class="nav-link" href="/create">+ Create a Course</a>
+              </li>
+              <li class="nav-item">
+                <a style="font-size: 20px;margin-left: 60px;color: white;" class="nav-link" href="/insights">Insights</a>
+              </li>
+              <li class="nav-item">
+                <a style="font-size: 20px;margin-left: 60px;color: white;" class="nav-link" href="/Request">Pending Requests</a>
+              </li>
+            </ul></center>
+            
+          </div>
+        </div>
+      </nav>
+</div>
+
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+  <strong>Message : </strong> {{ message }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<br><br><center><hr><h2 style="font-style:italic;"><u>Your Published Courses</u> </h2></center><br>
+{% endfor %}
+<div class="container">
+    <div class="row">
+      {% for i in list  %}
+        <div style="padding:30px;" class="col-md-4 col-sm-6">
+        <div class="card" style="width: 18rem;">
+            <center>
+            <div class="card-body">
+              <h5 class="card-title">Course No. {{ forloop.counter }} </h5>
+              <p class="card-text" name="coursename">{{ i.course_name }}</p>
+              
+            </div></center>
+        </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<hr>
+<br><br>
+<center>
+    <div style="width: 40%;font-size: 20px">
+        <div class="card card-body">
+          <!-- Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger. -->
+          <form  action='/course' method ="POST">
+              {% csrf_token %}
+            <div class="form-group">
+              <label for="exampleInputEmail1">Course Name</label>
+              <input type="text" name='coursename' class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Eg: Introduction To Programming">
+              <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+            </div><br>
+            <div class="form-group">
+              <label for="exampleInputPassword1">Active time</label><br> 
+              <input type="number" class="form-control" name='time' id="exampleInputPassword1" placeholder="time in minutes">
+            </div>
+            <br>
+           <div class="form-group">
+            <div class="form-check">
+              <input value="onboard" class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onclick="fun1()" checked>
+              <label class="form-check-label" for="flexRadioDefault">
+                Disallow Geolocation
+              </label>
+            </div>
+            <hr>
+            <div class="form-check">
+              <input value="onboard" class="form-check-input" type="radio" name="flexRadioDefault" onclick="fun2()" id="flexRadioDefault2" >
+              <label class="form-check-label" for="flexRadioDefault">
+                Allow Geolocation <br>
+              </label>
+            </div>
+           </div>
+            <div id="Fun1"></div><br>
+            <div >
+              <input class="form-control" name="radius" id="Fun2" type="number" placeholder="Radius Distance in metres">
+            </div>
+            <br>
+            <button type="submit" class="btn btn-primary">Start Taking Attendance</button>
+          </form>
+        </div>
+      </div>
+</center>
+<br><br><br><br>
+<script>
+  document.getElementById("Fun2").disabled = true;
+  function fun1(){
+    //var Myelement = document.querySelector('input[name="flexRadioDefault"]');
+    //Myelement.value = "onboard";
+   // console.log(Myelement.value);
+    document.getElementById("Fun2").disabled = true;
+    document.getElementById("Fun1").innerHTML = ' ';
+  }
+
+
+  function fun2(){
+    if('geolocation' in navigator){
+      navigator.geolocation.getCurrentPosition(position=>{
+        var latitude=position.coords.latitude;
+        var longitude=position.coords.longitude;
+        console.log(latitude,longitude);
+        //var Myelement = document.querySelector('input[name="flexRadioDefault"]');
+        //console.log(Myelement.value);
+      var a= latitude.toString();
+      var b= longitude.toString();
+      var v= a.concat("+",b);
+
+        
+       document.getElementById("flexRadioDefault2").value = v;
+       //console.log(Myelement.value);
+        document.getElementById("Fun2").disabled = false;
+        document.getElementById("Fun1").innerHTML = '<hr><p>Info About this project</p> <img width="100%" src="/static/globe.jpg">';
+
+        },error=>{
+        alert("Please allow location");
+      });
+    }
+    else{
+      alert("Not Supported");
+    }
+  }
+
+</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script> 
+</body>
+</html>
+       

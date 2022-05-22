@@ -2,6 +2,7 @@ from io import SEEK_END
 from operator import imod
 from pickle import TRUE
 from re import S
+import re
 from reprlib import aRepr
 from xmlrpc.client import TRANSPORT_ERROR
 from cv2 import idct
@@ -30,7 +31,7 @@ import cvzone
 import numpy as np
 import face_recognition
 import time
-
+from math import radians, cos, sin, asin, sqrt
 from django.http.response import StreamingHttpResponse
 import glob
 import numpy as np
@@ -154,6 +155,9 @@ def course(request):
         Time=request.POST.get('time')
         Time=int(Time)
         a=round(time.time() * 1000)
+        location=request.POST.get('flexRadioDefault')
+        print(location)
+        
         if len(l)>0:
             A=l[0]
             if A.time_future <= a:
@@ -167,12 +171,22 @@ def course(request):
             messages.error(request,"No such course name found with your account ")
 
         else :
+            latitude=0
+            longitude=0
+            bool=0
+            radius=0
+            if location != "onboard":
+                bool=1
+                location=location.split('+')
+                latitude=float(location[0])
+                longitude=float(location[1])
+                radius=request.POST.get('radius')
             a=round(time.time() * 1000)
             print(a)
             b=a
             a=a+((Time*60)*1000)
             hi=datetime.date.today()
-            m1=Live(username=request.user.username,course_name=c_name,time_future=a,attended_list="",date=hi,time_present=b)
+            m1=Live(username=request.user.username,course_name=c_name,time_future=a,attended_list="",date=hi,time_present=b,latitude=latitude,longitude=longitude,bool=bool,radius=radius)
             m1.save()
             gi=0
             m2=Course_str(username=request.user.username,course_name=c_name,date=hi,time_present=b,attended_list="")
@@ -296,7 +310,28 @@ def run(username):
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
+def Calculate_globe_distance(a,b,c,d,radius):
+    print(a,b)
+    print(c,d)
+    lon1 = radians(c)
+    lon2 = radians(d)
+    lat1 = radians(a)
+    lat2 = radians(b)
+      
+    # Haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+ 
+    c = 2 * asin(sqrt(a))
+    r = 6371
+    r=r*c
+    r=r*1000
+    print("Your distance difference between in metres is ",abs(r))
+    if r < abs(radius) :
+        return True
 
+    return False
 
 If_posted=False
 Response_charge=False
@@ -305,7 +340,6 @@ def stu(request):
     d=dict()
     if(request.method=="POST"):
         if len(request.user.username) !=0:  
-            
             hi=request.POST.get("krish")   
             print(hi)
             hi=hi.split(',')
@@ -314,6 +348,15 @@ def stu(request):
             if len(objectt1) !=0:
                 messages.success(request,"Attendance is already Marked")
             else:
+                bool = int(hi[3])
+                if bool == 1:
+                    print("THIS is hgone inside")
+                    location=hi[7]
+                    location=location.split('+')
+                    if Calculate_globe_distance(float(hi[4]),float(location[0]),float(hi[5]),float(location[1]),float(hi[6])) == False:
+                        messages.error(request,"Your Current Location is out of the range which instructor had set In. So please Go to Class to mark it.")
+                        return redirect('/')
+
                 global If_posted
                 If_posted=True
                 global Response_charge

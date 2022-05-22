@@ -78,7 +78,7 @@
                 <button type="button" class="btn btn-secondary" onclick="scr()" data-bs-dismiss="modal">Close</button>
                 <form method="POST" action="/student_page">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-success" value="{{ final1.username }},{{ final1.course_name }},{{ final1.time_present }}" name="krish">Mark</button></form>
+                  <button id="query" type="submit" class="btn btn-success" value="{{ final1.username }},{{ final1.course_name }},{{ final1.time_present }},{{ final1.bool }},{{ final1.latitude }},{{ final1.longitude }},{{ final1.radius }}" name="krish">Mark</button></form>
               </div>
             </div>
           </div>
@@ -86,6 +86,31 @@
     </div>
   </div>
 </div>
+
+{% if final1.bool == 1 %}
+<script>
+  if('geolocation' in navigator){
+    navigator.geolocation.getCurrentPosition(position=>{
+      var latitude=position.coords.latitude;
+      var longitude=position.coords.longitude;
+      console.log(latitude,longitude);
+      var Myelement = document.getElementById("query").value;
+      var a= latitude.toString();
+      var b= longitude.toString();
+      var v= a.concat("+",b);
+      var d = Myelement
+      var t= d.concat(",",v);
+      document.getElementById("query").value = t;
+      console.log(t)
+      },error=>{
+      alert("Please allow location");
+    });
+  }
+  else{
+    alert("Not Supported");
+  }
+</script>
+{% endif %}
 <script>
   function typescript(){
     var a=document.getElementById("takeaction")

@@ -56,6 +56,10 @@ class Live(models.Model):
     time_present=models.IntegerField(default=0)
     attended_list=models.TextField(null=True)
     date=models.DateField(default="2021-10-10")
+    latitude=models.DecimalField(max_digits=19,decimal_places=15,default=0)
+    longitude=models.DecimalField(max_digits=19,decimal_places=15,default=0)
+    bool = models.IntegerField(default=0)
+    radius = models.IntegerField(default=0,)
     # date=models.DateField()
     # check=models.CharField()
     class Meta:

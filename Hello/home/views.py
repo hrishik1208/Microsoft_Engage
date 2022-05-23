@@ -59,7 +59,8 @@ def index(request):
         print(D)
         print(password)
         if(D != password):
-            return render(request,'err.html')
+            messages.error(request,"Password Not Matched")
+            return redirect('/')
         if Teacher_reg.objects.filter(username=username).exists():
             d["name"]=c.first_name
             if c is not None:
@@ -86,12 +87,6 @@ def index(request):
 
 def teach(request):
     d=dict()
-    if(len(request.user.username)==0):
-        return redirect('/')
-
-    if Teacher_reg.objects.filter(username=request.user.username).exists() == False :
-        return redirect('/')
-
     if(request.method=="POST"):
         if len(request.user.username) !=0:
             abcd=request.POST.get("hari")
@@ -107,6 +102,7 @@ def teach(request):
                 messages.error(request,"Account with the username already exists")
                 return redirect('/')
             else:
+                print("hayabuzza")
                 con=Teacher_reg(name=name,email=email,username=username,password=password)
                 con.save()
                 user=User(username=username,email=email,password=password,first_name=name,last_name=name)
@@ -114,6 +110,14 @@ def teach(request):
                 if user is not None: 
                     messages.success(request,"Registered Succsessfully") 
                     auth.login(request,user) 
+                    
+    if(len(request.user.username)==0):
+        return redirect('/')
+
+    if Teacher_reg.objects.filter(username=request.user.username).exists() == False :
+        return redirect('/')
+
+    
 
     active=Live.objects.filter(username=request.user.username)
     comments = Course_str.objects.filter(username=request.user.username)
@@ -468,7 +472,7 @@ def stu(request):
             password=request.POST.get('password')
             val=recognize(username=username,If_posted=0,Response_charge=0)
             val.save()
-            val1=Join(username=username,bool=0)
+            val1=Join(username=username,If_posted=0,Response_charge=0)
             val1.save()
             if User.objects.filter(username=username).exists():
                 messages.error(request,"Account with the username already exists")
@@ -576,6 +580,8 @@ def join(request):
             return redirect('/')
         else:
             print(g)
+            
+            val1=Join(username=request.user.username,If_posted=0,Response_charge=0)
             count=0
             val1=Join(username=request.user.username,If_posted=1,Response_charge=0)
             val1.save()
@@ -641,42 +647,9 @@ def profile(request):
 
 
 def cam(request):
-    if(request.method == 'POST'):
-        run()
-        # iu=Mains.objects.get(name="kshh")
-        # ipg=cv2.imread('static/1.jpg',1)
-        # print(iu.img)
-        # ipg=cv2.imread(str(iu.img),1)
-        # cv2.imshow('vacd',ipg)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
-
-        
-        # Detecting the faces.
-
-        # image = face_recognition.load_image_file("media/H1.jpg")
-        # face_locations = face_recognition.face_locations(image)
-        # print(face_locations)
-        
-        # recognition part
-       
-        # img1=cv2.imread('media/H1.jpg')
-        # img2=cv2.imread('media/Frame0.jpg')
-        # rgb_img1=cv2.cvtColor(img1,cv2.COLOR_BGR2RGB)
-        # img1_encoding=face_recognition.face_encodings(rgb_img1)[0]
-        # rgb_img2=cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
-        # img2_encoding=face_recognition.face_encodings(rgb_img2)[0]
-        # result = face_recognition.compare_faces([img1_encoding],img2_encoding)
-
-
-        # saving image to     model part
-
-        # con=Mains(name="kah",img='Frame0.jpg')
-        # con.save()
-        # print(request.user.username)
-        return HttpResponse()
-
-    return render(request,'cam.html')
+    d=dict()
+    d["name"]="Hari Vanshray Bacchhan"
+    return render(request,'boiler.html',d)
     
 
 def logout(request):

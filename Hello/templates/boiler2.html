@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="static/bootstrap/css/bootstrap.min.css" >
+    <title>Attendance Management Portal</title>
+    {% block script %}{% endblock  %}
+</head>
+<body>
+<div>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#4E5460;position: relative;">
+        <div >
+          <!-- <a class="navbar-brand" href="#">Navbar</a> -->
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div style="font-size: 20px;padding-left: 40px;" class="collapse navbar-collapse" id="navbarNav">
+            <center>
+            <ul class="navbar-nav" style="">
+                <li class="nav-item">
+                    <a style="font-size: 20px;padding-left: 40px;color: white;" class="nav-link active" aria-current="page" href="#"><div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        Hi Student, {{ name }}
+                      </button>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                      <form method="POST" action="/logout">
+                          {% csrf_token %}
+                          <button class="form-control btn btn-primary" type="submit">Logout</button>
+                      </form></div>
+                    </div></a>
+                  </li>
+              <li class="nav-item">
+                <a style="font-size: 20px;color: white;margin-left: 30px;" class="nav-link {% block navlist1 %}  {% endblock  %}" aria-current="page" href="/student_page">Home</a>
+              </li>
+              <li class="nav-item">
+                <a style="font-size: 20px;margin-left: 60px;color: white;" class="nav-link  {% block navlist2 %}  {% endblock  %}" href="/join">+ Join a Course</a>
+              </li>
+              <li class="nav-item">
+                <a style="font-size: 20px;margin-left: 60px;color: white;" class="nav-link  {% block navlist3 %}  {% endblock  %}" href="/profile">Attendance Records</a>
+              </li>
+            </ul></center> 
+          </div>
+        </div>
+    </nav>
+</div>
+{% for message in  messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+  <strong>Message : </strong> {{ message }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>{% endfor %}
+<br>
+{% block body %}
+
+
+{% endblock  %}
+<script src="static/bootstrap/js/popper.min.js" ></script>
+<script src="static/bootstrap/js/bootstrap.min.js" ></script>    
+</body>
+</html>

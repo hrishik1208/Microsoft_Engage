@@ -35,6 +35,7 @@ from math import radians, cos, sin, asin, sqrt
 from django.http.response import StreamingHttpResponse
 import glob
 import numpy as np
+from django.core.mail import send_mail
 
 def index(request): 
     curr=request.user
@@ -302,7 +303,6 @@ def details(request):
         return redirect('/')
 
     if request.method=="POST":
-        
         present_time=request.POST.get('detail')
         object=Course_str.objects.filter(username=request.user.username,time_present=int(present_time))
         final_attended=[]
@@ -336,7 +336,8 @@ def details(request):
         d["date"]=object[0].date
         d["No_of_attended"]=len(final_attended)
         d["No_of_unattended"]=len(final_unattended)
-
+        print(len(final_attended))
+        print(len(final_unattended))
         return render(request,'detail.html',d)
     return redirect('/insights')
 

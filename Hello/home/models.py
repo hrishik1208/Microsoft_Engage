@@ -41,7 +41,7 @@ class Student_reg(models.Model):
 class Course(models.Model): 
     username=models.CharField(max_length=100) 
     course_name=models.CharField(max_length=100) 
-    join_code=models.IntegerField()
+    join_code=models.CharField(max_length=100) 
     # date=models.DateField()
     # check=models.CharField()
 
@@ -88,7 +88,7 @@ class Non_approved(models.Model):
     s_email=models.CharField(max_length=100)
     course_name=models.CharField(max_length=100)
     img=models.ImageField(null=True,blank=True)
-    join_code=models.IntegerField()
+    join_code=models.CharField(max_length=100) 
 
     def __str__(self):
         return self.course_name
@@ -101,7 +101,7 @@ class Approved(models.Model):
     s_email=models.CharField(max_length=100)
     course_name=models.CharField(max_length=100)
     img=models.ImageField(null=True,blank=True)
-    join_code=models.IntegerField()
+    join_code=models.CharField(max_length=100) 
 
     def __str__(self):
         return self.course_name

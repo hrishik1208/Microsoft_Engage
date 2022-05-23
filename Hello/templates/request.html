@@ -25,7 +25,7 @@
                      <td><a href="/media/{{i.img}}">img</a></td>
                      <td>
                        <form action="/Request" method="POST">
-                         {% csrf_token %}<button type="submit" class="btn-success" value="{{ i.s_username }},{{ i.course_name }},{{ i.s_id }},{{ i.s_email }},{{ i.join_code }}" name="hari" >Accept</button></form></td>
+                         {% csrf_token %}<button type="submit" class="btn btn-primary" value="{{ i.s_username }},{{ i.course_name }},{{ i.s_id }},{{ i.s_email }},{{ i.join_code }}" name="hari" >Accept</button></form></td>
                    </tr>
                    
                {% endfor %}

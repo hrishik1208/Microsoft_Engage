@@ -11,16 +11,16 @@
             {% csrf_token %}
           <div class="form-group">
             <label for="exampleInputEmail1">Course Name</label><br> 
-            <input type="text" name='coursename' class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Eg: Introduction To Programming">
+            <input type="text" name='coursename' class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Eg: Introduction To Programming" required>
             <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
           </div><br>
           <div class="form-group">
             <label for="exampleInputPassword1">Course Join Code</label><br> 
-            <input type="text" class="form-control" name='code' id="exampleInputPassword1" placeholder="4-digit number code">
+            <input type="text" class="form-control" name='code' id="exampleInputPassword1" placeholder="4-digit code" required>
           </div>
           <br><div class="form-group">
             <label for="exampleInputPassword1">Your University/Course Id no.</label><br> 
-            <input type="text" class="form-control" name='id' id="exampleInputPassword1" placeholder="Id-Number">
+            <input type="text" class="form-control" name='id' id="exampleInputPassword1" placeholder="Id-Number" required>
           </div>
           <br>
           <img width="100%" src="{% url 'video_feed' %}">

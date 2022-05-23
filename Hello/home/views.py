@@ -181,6 +181,7 @@ def course(request):
             bool=0
             radius=0
             if location != "onboard":
+                radius=request.POST.get('radius')
                 bool=1
                 location=location.split('+')
                 latitude=float(location[0])
@@ -223,7 +224,10 @@ def create(request):
     if(request.method=="POST"):
         c_name=request.POST.get('coursename')
         code=request.POST.get('code')
-        if Course.objects.filter(course_name=c_name,username=request.user.username).exists():
+        
+        if len(code) != 4:
+            messages.error(request,"The Join Code should be a 4 digit number")
+        elif Course.objects.filter(course_name=c_name,username=request.user.username).exists():
             c=request.user
             d["name"]=c.first_name
             c=c.username
@@ -235,7 +239,6 @@ def create(request):
             us=Course(username=c,course_name=c_name,join_code=code)
             us.save()
             messages.success(request,"The course is registered successfully")
-        return render(request,'teach_create.html',d)
     
     c=request.user
     d["name"]=c.first_name
@@ -553,8 +556,7 @@ def join(request):
 
     if Student_reg.objects.filter(username=request.user.username).exists() == False :
         return redirect('/')
-
-    video = cv2.VideoCapture(0)
+        
     # if os.path.exists('media/H1.jpg'):
     #     print("Yes file is there")
     global processing_imageno
@@ -566,14 +568,21 @@ def join(request):
         c_name=request.POST.get('coursename')
         code=request.POST.get('code')
         id=request.POST.get('id')
+        if len(code) != 4:
+            messages.error(request,"The Join Code should be a 4 digit number")
+            return redirect('/')
         g=Course.objects.filter(course_name=c_name,join_code=code)
         g1=Non_approved.objects.filter(course_name=c_name,join_code=code,s_username=request.user.username)
+        My_record=Approved.objects.filter(course_name=c_name,join_code=code,s_id=id)
         g2=Approved.objects.filter(course_name=c_name,join_code=code,s_username=request.user.username)
         if len(g)==0:
             messages.error(request,"No Instructor found with the given course and join code. Please try again! ")
             return redirect('/')
         elif len(g1) !=0:
             messages.error(request,"Request to Instructor has already been sent by your account previously. ")
+            return redirect('/')
+        elif len(My_record) !=0:
+            messages.error(request,"One student is already registered in the same course with the Id no. you provided.")
             return redirect('/')
         elif len(g2) !=0:
             messages.error(request,"You are already Registered ")

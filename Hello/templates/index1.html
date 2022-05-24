@@ -15,15 +15,22 @@
 <body>
 
     <div id="map"></div>
+    
     <script>
         function initMap(){
             var options = {
-                zoom:8,
-                center: {lat:42.3601,lng:-71.0589}
+                center: {lat:42.35248839211764,lng:-71.07492878663685},
+                zoom:12
             }
 
             var map = new google.maps.Map(document.getElementById('map'),options);
 
+            var markerOptions={
+                position: new google.maps.LatLng(42.35248839211764,-71.07492878663685),
+                map: map
+            }
+
+            var marker= new google.maps.Marker(markerOptions)
         }
 
     </script>

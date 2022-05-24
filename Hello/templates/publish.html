@@ -1,0 +1,83 @@
+{% extends 'basic.html' %}
+{% block script %} <script src="/static/Js/courses.js"></script> {% endblock  %}
+{% block name %} {{ name }} {% endblock %}
+
+{% block body %}
+
+<hr>
+<br><br>
+<center>
+    <div style="width: 40%;font-size: 20px">
+        <div class="card card-body">
+          <!-- Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger. -->
+          <form  action='/course' method ="POST">
+              {% csrf_token %}
+                <div class="container"><h4>Course : {{course}}</h4></div>
+                <hr>
+            <div class="form-group">
+              <label for="exampleInputPassword1">Active time</label><br> 
+              <input type="number" class="form-control" name='time' id="exampleInputPassword1" placeholder="time in minutes" required >
+            </div>
+            <br>
+           <div class="form-group">
+            <div class="form-check">
+              <input value="onboard" class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onclick="fun1()" checked>
+              <label class="form-check-label" for="flexRadioDefault">
+                Disallow Geolocation
+              </label>
+            </div>
+            <hr>
+            <div class="form-check">
+              <input value="onboard" class="form-check-input" type="radio" name="flexRadioDefault" onclick="fun2()" id="flexRadioDefault2" >
+              <label class="form-check-label" for="flexRadioDefault">
+                Allow Geolocation <br>
+              </label>
+            </div>
+           </div>
+            <div id="Fun1"></div><br>
+            <div >
+              <input class="form-control" name="radius" id="Fun2" type="number" placeholder="Radius Distance in metres" required >
+            </div>
+            <br>
+            <button value="{{course}}" name="course_name" type="submit" class="btn btn-primary">Start Taking Attendance</button>
+          </form>
+        </div>
+      </div>
+</center>
+<br><br><br><br>
+<script>
+  document.getElementById("Fun2").disabled = true;
+  function fun1(){
+
+    document.getElementById("Fun2").disabled = true;
+    document.getElementById("Fun1").innerHTML = ' ';
+  }
+
+
+  function fun2(){
+    if('geolocation' in navigator){
+      navigator.geolocation.getCurrentPosition(position=>{
+        var latitude=position.coords.latitude;
+        var longitude=position.coords.longitude;
+        console.log(latitude,longitude);
+      var a= latitude.toString();
+      var b= longitude.toString();
+      var v= a.concat("+",b);
+
+        
+       document.getElementById("flexRadioDefault2").value = v;
+        document.getElementById("Fun2").disabled = false;
+        document.getElementById("Fun1").innerHTML = '<hr><p>Info About this project</p> <img width="100%" src="/static/images/globe.jpg">';
+
+        },error=>{
+        alert("Please allow location");
+      });
+    }
+    else{
+      alert("Not Supported");
+    }
+  }
+
+</script>
+
+{% endblock %}

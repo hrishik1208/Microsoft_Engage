@@ -1,0 +1,39 @@
+{% extends 'basic.html' %}
+
+{% block name %} {{ name }} {% endblock %}
+
+
+{% block body %}
+
+<div class="container">
+    <h3>Course : {{course}} </h3>
+    <br>
+    
+    <center>
+    <table class="table">
+        <thead>
+          <tr style="background-color:#F5F5F5;">
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Id No.</th>
+            <th scope="col">Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in data %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ i.name }}</td>
+            <td>{{i.id}}</td>
+            <td><form action="/del_student" method="POST" >{% csrf_token %}<button type="submit" class="btn btn-primary" value="{{ i.user }}+{{course}}" name="delete" >Delete <i class="fa-solid fa-delete-left"></i> </button></form></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    
+    <form action="/del_student" method="POST" >{% csrf_token %}<button style="padding: 1%;" type="submit" class="btn btn-primary" value="delete_all+{{course}}" name="delete" >Delete  All<i class="fa-solid fa-delete-left"></i> </button></form>
+
+</center>
+</div>
+{% endblock  %}
+

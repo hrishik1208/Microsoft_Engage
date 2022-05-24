@@ -16,6 +16,9 @@ urlpatterns = [
     path('video_feed_1', views.video_feed_1, name='video_feed_1'),
     # path('saveimage',views.saveimage, name='saveimage').
      path('details', views.details, name='details'),
-    path('cam',views.cam, name='cam'),
+    path('publish',views.publish, name='publish'),
+    path('course_details',views.course_details, name='course_details'),
+    path('del_student',views.del_student, name='del_student'),
     path('logout',views.logout, name='logout')
 ]
+

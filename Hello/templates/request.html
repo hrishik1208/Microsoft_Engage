@@ -4,40 +4,47 @@
 {% block body %}
 <center>
     <center>
-        <h1 style="font-size:30px;">Pending Approvals</h1>
-        <hr>
-        <table style="width: 70%;font-size: 20px;border: 1px solid black;" class="table">
-            <thead>
-              <tr>
-                <th scope="col">Course Name</th>
-                <th scope="col">Student Username</th>
-                <th scope="col">Student University Id no.</th>
-                <th scope="col">Image of Student</th>
-                <th scope="col">Accept</th>
-              </tr>
-              {% for i in listt %}
-                   <tr>
-                     <td>
-                       {{ i.course_name }}
-                     </td>
-                     <td>{{ i.s_username }}</td>
-                     <td>{{ i.s_id }}</td>
-                     <td><a href="/media/{{i.img}}">img</a></td>
-                     <td>
-                       <form action="/Request" method="POST">
-                         {% csrf_token %}<button type="submit" class="btn btn-primary" value="{{ i.s_username }},{{ i.course_name }},{{ i.s_id }},{{ i.s_email }},{{ i.join_code }}" name="hari" >Accept</button></form></td>
-                   </tr>
-                   
-               {% endfor %}
-            
-            </thead>
-      </table>
-      
-      <form action="/Request" method="POST">
-        {% csrf_token %}<button type="submit" style="padding:1%" class="btn btn-primary" value="Accept_all" name="hari" >Accept ALL</button></form>
       {% if sign == 0 %}</center>
-      <img src="" alt="">No pending approvals
+      <div class="container"><h2>No pending approvals</h2>
+ 
+        <img width="50%" src="static/images/thumb.jpg" alt=""></div></div>
+     
+      {% else %}
+      <h1 style="font-size:30px;">Pending Approvals</h1>
+      <hr>
+      <table style="width: 70%;font-size: 20px;border: 1px solid black;" class="table">
+          <thead>
+            <tr>
+              <th scope="col">Course Name</th>
+              <th scope="col">Student Username</th>
+              <th scope="col">Student University Id no.</th>
+              <th scope="col">Image of Student</th>
+              <th scope="col">Accept</th>
+            </tr>
+            {% for i in listt %}
+                 <tr>
+                   <td>
+                     {{ i.course_name }}
+                   </td>
+                   <td>{{ i.s_username }}</td>
+                   <td>{{ i.s_id }}</td>
+                   <td><a href="/media/{{i.img}}">img</a></td>
+                   <td>
+                     <form action="/Request" method="POST">
+                       {% csrf_token %}<button type="submit" class="btn btn-primary" value="{{ i.s_username }},{{ i.course_name }},{{ i.s_id }},{{ i.s_email }},{{ i.join_code }}" name="hari" >Accept</button></form></td>
+                 </tr>
+                 
+             {% endfor %}
+          
+          </thead>
+    </table>
+    
+    <form action="/Request" method="POST">
+      {% csrf_token %}<button type="submit" style="padding:1%" class="btn btn-primary" value="Accept_all" name="hari" >Accept ALL</button></form>
+
       {% endif %}
+        
+      
 {% endblock  %}
 
 

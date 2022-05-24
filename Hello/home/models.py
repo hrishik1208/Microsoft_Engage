@@ -125,6 +125,7 @@ class Join(models.Model):
     username=models.CharField(max_length=100,primary_key=True)
     If_posted=models.IntegerField(default=0)
     Response_charge=models.IntegerField(default=0)
+    course_name=models.CharField(max_length=100,default="")
 
 class recognize(models.Model):
     username=models.CharField(max_length=100,primary_key=True)

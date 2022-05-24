@@ -156,7 +156,7 @@ def course(request):
     d=dict()
     if(request.method=="POST"):
         l= Live.objects.filter(username=request.user.username)
-        c_name=request.POST.get('coursename')
+        c_name=request.POST.get('course_name')
         Time=request.POST.get('time')
         Time=int(Time)
         a=round(time.time() * 1000)
@@ -209,6 +209,7 @@ def course(request):
     L=[1,2,3]
     d["H"]=L
     d["y"]=range(0,len(l)) 
+    d["num"]=len(l)
     return render(request,'courses.html',d)
 
 
@@ -283,11 +284,12 @@ def Request(request):
         else:
             s=s.split(',')
             li=Teacher_reg.objects.filter(username=request.user.username)
-            con=Approved(t_username=request.user.username,t_name=li[0].name,s_username=s[0],s_email=s[3],s_id=s[2],course_name=s[1],img=str(s[0])+"0.jpg",join_code=s[4])
+            con=Approved(t_username=request.user.username,t_name=li[0].name,s_username=s[0],s_email=s[3],s_id=s[2],course_name=s[1],img=str(s[0])+"_imageno_0"+str(s[1])+".jpg",join_code=s[4])
             con.save()
             con1=Non_approved.objects.filter(t_username=request.user.username,s_username=s[0],course_name=s[1])
             con1.delete()
             print(s)
+        messages.success(request, 'Approved Successfully')
 
     listt=Non_approved.objects.filter(t_username=request.user.username)
     sign=1
@@ -299,6 +301,7 @@ def Request(request):
     d["name"]=request.user.first_name
     d["sign"]=sign
     d["listt"]=listt
+    
     return render(request,'request.html',d)
 
 
@@ -343,28 +346,93 @@ def details(request):
         d["date"]=object[0].date
         d["No_of_attended"]=len(final_attended)
         d["No_of_unattended"]=len(final_unattended)
+        d["total"]=len(final_attended)+len(final_unattended)
         print(len(final_attended))
         print(len(final_unattended))
         return render(request,'detail.html',d)
     return redirect('/insights')
 
-def run(username):
-    cap = cv2.VideoCapture(0)
-    i = 0
-    h=True
-    while(i<5 and cap.isOpened()):
-        ret, frame = cap.read()
-        
-        if h == True:
-            cv2.imwrite('media/'+str(username)+'.jpg', frame)
-            h=False
-        i += 1
+
+
+def publish(request):
+    if(len(request.user.username)==0):
+        return redirect('/')
+
+    if Teacher_reg.objects.filter(username=request.user.username).exists() == False :
+        return redirect('/')
+
+    d=dict()
+    if request.method=="POST":
+        print("Hi there")
+        c_name=request.POST.get('Harry')
+        print(c_name)
+        d["name"]=request.user.first_name
+        d["course"]=c_name
+        return render(request,'publish.html',d)
     
-    cap.release()
-    cv2.destroyAllWindows()
+    return redirect('/course')
+
+def course_details(request):
+    if(len(request.user.username)==0):
+        return redirect('/')
+
+    if Teacher_reg.objects.filter(username=request.user.username).exists() == False :
+        return redirect('/')
+
+    d=dict()
+    if request.method=="POST":
+        print("Hi there")
+        c_name=request.POST.get('Harry')
+        print(c_name)
+        data=Approved.objects.filter(t_username=request.user.username,course_name=c_name)
+        d["name"]=request.user.first_name
+        d["course"]=c_name
+        final_data=[]
+        for i in data:
+            dictionary=dict()
+            object=Student_reg.objects.filter(username=i.s_username)
+            dictionary["name"]=object[0].name 
+            dictionary["id"]=i.s_id 
+            dictionary["user"]=i.s_username
+            final_data.append(dictionary)
+
+        d["data"]=final_data
+        return render(request,'course_details.html',d)
+    
+    return redirect('/course')
+
+def del_student(request):
+    if(len(request.user.username)==0):
+        return redirect('/')
+
+    if Teacher_reg.objects.filter(username=request.user.username).exists() == False :
+        return redirect('/')
+
+    d=dict()
+    if request.method=="POST":
+        print("Hi there")
+        user=request.POST.get('delete')
+        user=user.split('+')
+        print(user[0],user[1])
+        if user[0] == "delete_all":
+            li=Approved.objects.filter(t_username=request.user.username,course_name=user[1])
+            count=0
+            for i in range(0,len(li)):
+                count+=1
+                ob=li[i]
+                ob.delete()
+            print("count is",count)
+        else:
+            li=Approved.objects.filter(t_username=request.user.username,s_username=user[0],course_name=user[1])
+            li[0].delete()
+        messages.success(request,"Student Removed")
+        return redirect('/course')
+    
+    return redirect('/course')
 
 
-# --------------------------------------------------------------------------------------------------------------------------------------------
+
+# # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
 #  Student Part Below  ||
@@ -433,7 +501,7 @@ def stu(request):
                 val1=recognize(username=val[0].username,If_posted=0,Response_charge=0)
                 val1.save()
 
-                img1=cv2.imread('media/'+request.user.username+'_imageno_0.jpg')
+                img1=cv2.imread('media/'+str(request.user.username)+'_imageno_0'+str(objectt[0].course_name)+'.jpg')
                 # img1=cv2.imread('media/H.jpg')
                 rgb_img1=cv2.cvtColor(img1,cv2.COLOR_BGR2RGB)
                 img1_encoding=face_recognition.face_encodings(rgb_img1)[0]
@@ -446,7 +514,6 @@ def stu(request):
                 result = face_recognition.compare_faces([img1_encoding],img2_encoding)
 
                 if result[0] == True:
-                    
                     objectf=Student_attendace_report(t_username=objectt[0].t_username,s_username=request.user.username,course_name=objectt[0].course_name,date=objectt[0].date,bool=1,time_present=objectt[0].time_present)
                     objectf.save()
                     target=Course_str.objects.filter(username= objectt[0].t_username,course_name=objectt[0].course_name,time_present=int(hi[2]))
@@ -464,6 +531,7 @@ def stu(request):
                     objectt[0].delete()
                     messages.success(request,"Attendance Marked Successfully")
                     return redirect('/student_page')
+
                 else:
                     messages.error(request,"Face Not matched. Please Mark Again")
                     return redirect('/student_page')
@@ -475,7 +543,7 @@ def stu(request):
             password=request.POST.get('password')
             val=recognize(username=username,If_posted=0,Response_charge=0)
             val.save()
-            val1=Join(username=username,If_posted=0,Response_charge=0)
+            val1=Join(username=username,If_posted=0,Response_charge=0,course_name="")
             val1.save()
             if User.objects.filter(username=username).exists():
                 messages.error(request,"Account with the username already exists")
@@ -556,7 +624,7 @@ def join(request):
 
     if Student_reg.objects.filter(username=request.user.username).exists() == False :
         return redirect('/')
-        
+
     # if os.path.exists('media/H1.jpg'):
     #     print("Yes file is there")
     global processing_imageno
@@ -590,9 +658,9 @@ def join(request):
         else:
             print(g)
             
-            val1=Join(username=request.user.username,If_posted=0,Response_charge=0)
+            val1=Join(username=request.user.username,If_posted=0,Response_charge=0,course_name=c_name)
             count=0
-            val1=Join(username=request.user.username,If_posted=1,Response_charge=0)
+            val1=Join(username=request.user.username,If_posted=1,Response_charge=0,course_name=c_name)
             val1.save()
             val=Join.objects.filter(username=request.user.username)
             while val[0].Response_charge == 0:
@@ -606,8 +674,8 @@ def join(request):
             li2=Student_reg.objects.filter(username=request.user.username)
             # run(str(request.user.username)+str(li[0].username))
             # print("This ihiowhuowhon",str(request.user.username)+str(li[0].username)+".jpg")
-            st = request.user.username+'_imageno_'
-            img2=cv2.imread('media/'+request.user.username+'_imageno_'+str(0)+'.jpg')
+            st = request.user.username+'_imageno_0'
+            img2=cv2.imread('media/'+str(request.user.username)+'_imageno_0'+str(c_name)+'.jpg')
             rgb_img2=cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
             if( len(face_recognition.face_encodings(rgb_img2)) ==0):
                 messages.error(request,"Please Try Again")
@@ -615,7 +683,7 @@ def join(request):
 
             else:
 
-                con=Non_approved(t_username=li[0].username,t_name=li[0].name,s_username=request.user.username,s_email=li2[0].email,s_id=id,course_name=c_name,img=st+str(0)+'.jpg',join_code=code)
+                con=Non_approved(t_username=li[0].username,t_name=li[0].name,s_username=request.user.username,s_email=li2[0].email,s_id=id,course_name=c_name,img=st+str(c_name)+'.jpg',join_code=code)
                 con.save()
                 messages.success(request,"Request sent to respective Instructor Successfully ")
             return redirect('/')
@@ -630,6 +698,8 @@ def profile(request):
         
     if Student_reg.objects.filter(username=request.user.username).exists() == False :
         return redirect('/')
+    
+    
     d=dict()
     d["name"]=request.user.first_name
     all_attend=Course_str.objects.filter()
@@ -638,6 +708,8 @@ def profile(request):
     for i in range(0,len(all_attend)):
         object=all_attend[i]
         object1=Approved.objects.filter(s_username=request.user.username,course_name=object.course_name,t_username=object.username)
+        count_attendance=0
+        count_unattendance=0
         if len(object1)>0:
             dictionary=dict()
             dictionary["first"]=object
@@ -645,20 +717,22 @@ def profile(request):
             given=given.split("!!!!")
             if request.user.email in given:
                 dictionary["second"]=1
+                count_attendance+=1
             else:
                 dictionary["second"]=0
+                count_unattendance+=1
             
             final_list_of_courses.append(dictionary)
     
     final_list_of_courses.reverse()
     d["final_list_of_courses"]=final_list_of_courses
+    d["num"]=len(final_list_of_courses)
+    d["count_attendance"]=count_attendance
+    d["count_unattendance"]=count_unattendance
+    print(count_attendance)
+    print(count_unattendance)
     return render(request,'profile.html',d)
 
-
-def cam(request):
-    d=dict()
-    d["name"]="Hari Vanshray Bacchhan"
-    return render(request,'boiler.html',d)
     
 
 def logout(request):
@@ -666,10 +740,7 @@ def logout(request):
     auth.logout(request)
     return redirect('/')
 
-  
 
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('media/output.avi', fourcc, 20.0, (640, 480))
 detector = cv2.CascadeClassifier(r'haarcascade_frontalface_default.xml')
 hand_cascade=cv2.CascadeClassifier(r'aGest.xml')
 detectorf = FaceDetector()
@@ -693,8 +764,8 @@ def gen(request):
                 rgb_img1=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2RGB)
                 val=Join.objects.filter(username=request.user.username)
                 if val[0].If_posted == 1 and len(face_recognition.face_encodings(rgb_img1)) >0 :
-                    cv2.imwrite('media/'+str(request.user.username)+'_imageno_'+str(0)+'.jpg', frame_flip)
-                    val1=Join(username=val[0].username,If_posted=0,Response_charge=1)
+                    cv2.imwrite('media/'+str(request.user.username)+'_imageno_0'+str(val[0].course_name)+'.jpg', frame_flip)
+                    val1=Join(username=val[0].username,If_posted=0,Response_charge=1,course_name=val[0].course_name)
                     val1.save()
 
         elif len(bboxs)>1:
@@ -728,25 +799,6 @@ def gen1(request):
         hands=detectorh.findHands(frame_flip,draw=False)
         img, bboxs = detectorf.findFaces(frame_flip)
 
-        # gray=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2GRAY)
-        # all_faces = detector.detectMultiScale(gray,1.5,5)
-
-        # if len(all_faces)>0:
-        #     for face in all_faces:
-        #         x,y,w,h = face
-        #         rgb_img1=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2RGB)
-        #         global If_posted
-        #         global Response_charge
-        #         if If_posted == True and len(face_recognition.face_encodings(rgb_img1)) >0 :
-        #             cv2.imwrite('media/'+str(request.user.username)+'trial.jpg', frame_flip)
-        #             If_posted=False
-        #             Response_charge=True
-
-        #         cv2.rectangle(frame_flip, (x, y), (x+w,y+h), (0, 0, 255), 2)
-        #     cv2.putText(frame_flip,'Face detected',(330, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 128,0),2,cv2.LINE_AA)
-        # else:
-        #     cv2.putText(frame_flip,'No Face detected',(10, 50), cv2.FONT_HERSHEY_SIMPLEX,1,(0, 0, 255),2,cv2.LINE_AA)
-        
         if hands:
             x,y,w,h = hands[0]['bbox']
             cvzone.putTextRect(frame_flip,'',(x,y))

@@ -1,7 +1,16 @@
 {% extends 'boiler2.html' %}
 {% block name %} {{ name }} {% endblock %}
-{% block navlist1 %} btn btn-primary {% endblock  %}
+{% block navlist1 %} btn btn-outline-secondary {% endblock  %}
 {% block body %}
+
+{% if sign == 0 %}
+<center>
+  <hr>
+<div class="container">
+  <h3>Currently No Live Classes going on </h3>
+</center>
+</div>
+{% endif %}
 
 {% if sign == 1 %}
 <hr>
@@ -62,6 +71,9 @@
     alert("Not Supported");
   }
 </script>
+
+
+
 {% endif %}
 <script>
   function typescript(){
@@ -105,9 +117,11 @@
     <div class="row">
       {% for i in list  %}
         <div style="padding:30px;" class="col-md-4 col-sm-6">
-        <div class="card" style="width: 18rem;">
+        <div style="background-color:#F5F5F5;" class="card" style="width: 18rem;">
             <center>
+            
             <div class="card-body">
+              <div class="container"><h4>Course No. {{ forloop.counter }} </h4> </div>
               <h5 class="card-title">{{ i.course_name }} </h5>
               <p class="card-text" name="coursename">Instr. {{ i.t_name }}</p>
             </div></center>

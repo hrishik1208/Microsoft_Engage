@@ -439,6 +439,7 @@ def del_student(request):
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
+
 def Calculate_globe_distance(a,b,c,d,radius):
     print(a,b)
     print(c,d)
@@ -717,14 +718,18 @@ def profile(request):
             given=given.split("!!!!")
             if request.user.email in given:
                 dictionary["second"]=1
-                count_attendance+=1
             else:
                 dictionary["second"]=0
-                count_unattendance+=1
             
             final_list_of_courses.append(dictionary)
     
     final_list_of_courses.reverse()
+    for i in final_list_of_courses:
+        if i["second"] == 1:
+            count_attendance += 1
+        else:
+            count_unattendance += 1
+
     d["final_list_of_courses"]=final_list_of_courses
     d["num"]=len(final_list_of_courses)
     d["count_attendance"]=count_attendance

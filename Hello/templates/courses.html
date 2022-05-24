@@ -1,7 +1,7 @@
 {% extends 'basic.html' %}
 {% block script %} <script src="/static/Js/courses.js"></script> {% endblock  %}
 {% block name %} {{ name }} {% endblock %}
-{% block navlist2 %} btn btn-primary {% endblock  %}
+{% block navlist2 %} btn btn-outline-secondary {% endblock  %}
 {% block body %}
 
 <center><h2 ><u>Your Courses</u> </h2></center><hr><br>
@@ -16,11 +16,11 @@
       {% else %}
       {% for i in list  %}
         <div style="padding:30px;" class="col-lg-6 col-md-12 col-sm-12"><center>
-        <div class="card" style="width: 18rem;">
+        <div  class="card" style="width: 25rem;">
             
-            <div class="card-body">
-              <h5 class="card-title">Course No. {{ forloop.counter }} </h5>
-              <p class="card-text" name="coursename">{{ i.course_name }}</p>
+            <div style="background-color:#F5F5F5;" class="card-body">
+              <h5 class="card-title"><u> Course No. {{ forloop.counter }} </u></h5>
+              <div class="container"><h4 class="card-text" name="coursename">{{ i.course_name }}</h4></div><br>
               <div class="container">
              <form action="/publish" method="POST">{% csrf_token %} <button type="submit" value="{{i.course_name}}" name="Harry" class="btn btn-primary">Publish Attendance</button></form>
               <br>

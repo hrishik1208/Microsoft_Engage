@@ -1,25 +1,26 @@
 {% extends 'basic.html' %}
 {% block script %} <script src="/static/teach_page.js"></script> {% endblock  %}
 {% block name %} {{ name }} {% endblock %}
-{% block navlist1 %} btn btn-primary {% endblock  %}
+{% block navlist1 %} btn btn-outline-secondary {% endblock  %}
 {% block body %}
 
 
 {% if sign == 1 %}
 <hr>
 <center><h2>Live attendance Published</h2></center><br>
+
 <div style="margin-right:10%;" class="container">
   <div style="border: 2px solid black;" class="row">
     <div class="col-4">
       <img style="margin-left:-3%" width="50%" height="100%" src="static/images/course.jpg" alt="">
     </div>
     <div class="col-6">
-      <h4 style="margin-top:4%;">Course : {{ active.course_name }}</h4>
+      <h5 style="margin-top:4%;">Course : {{ active.course_name }}</h5>
     </div>
-    <div id="har" class="col-2">
+    <div id="har" class="col-2"><center>
       <h3 style="margin-top:5%;" id="val">{{ active.time_future }}</h3> 
       <form action="/teacher_page" method="POST">{% csrf_token %}
-      <button style="width:70%" name="hari" class="btn btn-danger" value="{{ active.course_name }}" >Stop</button></form>
+      <button style="width:100%" name="hari" class="btn btn-danger" value="{{ active.course_name }}" >Stop</button></form>
       <script> 
         var i = document.getElementById('val').innerHTML; 
         console.log(i); 
@@ -49,7 +50,7 @@
       </script>
     </div>
   </div>
-</div>
+</div></center>
 <hr>
 {% else %}
 <center>
@@ -57,27 +58,6 @@
   <h2>No classes running</h2>
   
 <img style="width:20%" src="static/images/empty.jpg" alt=""><hr>
-<h3>Past Publishes</h3>
-<hr></center>
-{% for i in past  %}
-<h2 style="margin-left:10%">{{ i.date }}</h2><center>
-<hr>
-<div style="margin-right:10%;" class="container">
-  <div style="border: 2px solid black;" class="row">
-    <div class="col-4">
-      <img style="margin-left:-3%" width="50%" height="100%" src="static/images/course.jpg" alt="">
-    </div>
-    <div class="col-6">
-      <h4 style="margin-top:4%;">Course : {{ i.course_name }}</h4>
-    </div>
-    <div id="har" class="col-2">
-      <h3 style="margin-top:10%;" id="val">Finished</h3> 
-    </div></center>
-  </div>
-</div>
-<hr>
-{% endfor %}
-
 
 {% endif %}
 

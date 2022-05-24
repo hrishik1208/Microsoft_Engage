@@ -1,6 +1,6 @@
 {% extends 'boiler2.html' %}
 {% block name %} {{ name }} {% endblock %}
-{% block navlist3 %} btn btn-primary {% endblock  %}
+{% block navlist3 %} btn btn-outline-secondary {% endblock  %}
 
 {% block body %}
 
@@ -43,36 +43,38 @@ function drawChart() {
   chart.draw(data,options);
 }
 </script>
+<center>
 
-  {% for i in final_list_of_courses %}
-  <div class="row">
-    <hr>
-    <div class="container">
-      Date : {{ i.first.date }}
-    </div>
-
-    <div style="border: 2px solid black;" class="row">
-      
-      <div class="col-3">
-        <img style="margin-left:-3%" width="50%" height="100%" src="static/images/course.jpg" alt="">
-      </div>
-      <div class="col-6">
-        <h4 style="margin-top:4%;">Course : {{ i.first.course_name }}</h4>
-      </div>
-      <div class="col-3">
+  <table class="table">
+    <thead>
+      <tr style="background-color:#F5F5F5;">
+        <th scope="col">#</th>
+        <th scope="col">Date</th>
+        <th scope="col">Course</th>
+        <th scope="col">Detail Insights</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in final_list_of_courses %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ i.first.date }}</td>
+        <td>{{ i.first.course_name}}</td>
         {% if i.second == 1 %}
-        <h4 style="margin-top:4%;">Attended  </h4>
+        <td> Attended <i style="color:green;" class="fa fa-solid fa-check"></i> </td>
 
         {% else %}
 
-        <h4 style="margin-top:4%;">Unattended </h4>
+        <td> Unattended <i style="color:red;" class="fa fa-solid fa-close"></i></h4>
         {% endif %}
-        
-      </div>
-    </div>
-  </div>
-  <br>
-{% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+
+</center>
 
   {% endif %}
   

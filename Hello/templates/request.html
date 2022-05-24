@@ -1,7 +1,9 @@
 {% extends 'basic.html' %}
 {% block name %} {{ name }} {% endblock %}
-{% block navlist5 %} btn btn-primary {% endblock  %}
+{% block navlist5 %} btn btn-outline-secondary {% endblock  %}
 {% block body %}
+
+
 <center>
     <center>
       {% if sign == 0 %}</center>
@@ -10,11 +12,14 @@
         <img width="50%" src="static/images/thumb.jpg" alt=""></div></div>
      
       {% else %}
-      <h1 style="font-size:30px;">Pending Approvals</h1>
-      <hr>
-      <table style="width: 70%;font-size: 20px;border: 1px solid black;" class="table">
+      <div style="background-color:#F3F4F6;padding:3%;" class="col-md-11 col-sm-12">
+        <div style="background-color:white;" class="container"><h3>
+          <br>
+          Pending Approvals
+        </h3><br>
+      <table class="table">
           <thead>
-            <tr>
+            <tr style="background-color:#F5F5F5;">
               <th scope="col">Course Name</th>
               <th scope="col">Student Username</th>
               <th scope="col">Student University Id no.</th>

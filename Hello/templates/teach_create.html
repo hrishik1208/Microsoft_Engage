@@ -1,13 +1,13 @@
 {% extends 'basic.html' %}
 {% block name %} {{ name }} {% endblock %}
-{% block navlist3 %} btn btn-primary {% endblock  %}
+{% block navlist3 %} btn btn-outline-secondary {% endblock  %}
 {% block body %}
 
 <br>
 <hr>
 <br><br><br>
 <center>
-    <div style="width: 50%;font-size: 20px">
+    <div class="container" style="width: 50%;font-size: 20px;">
         <div class="card card-body">
           <!-- Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger. -->
           <form  action='/create' method ="POST">
@@ -30,3 +30,4 @@
 <hr>
 
 {% endblock  %}
+

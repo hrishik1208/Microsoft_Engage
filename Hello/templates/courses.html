@@ -24,7 +24,7 @@
               <div class="container">
              <form action="/publish" method="POST">{% csrf_token %} <button type="submit" value="{{i.course_name}}" name="Harry" class="btn btn-primary">Publish Attendance</button></form>
               <br>
-              <form action="/course_details" method="POST">{% csrf_token %}<button type="submit" value="{{i.course_name}}" name="Harry" class="btn btn-primary">More Details</button></form>
+              <form action="/course_details" method="POST">{% csrf_token %}<button style="margin-top:-10px;" type="submit" value="{{i.course_name}}" name="Harry" class="btn btn-primary">Details</button></form>
             </div>
             </div>
         </div></center>

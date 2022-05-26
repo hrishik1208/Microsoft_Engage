@@ -4,9 +4,12 @@ from unicodedata import name
 from django.db import models
 from datetime import datetime
 import os
-
 from django.forms import ImageField, IntegerField
-# Create your models here.
+
+# List of All Models used in Our project
+
+# 1 . Model for storing Contact Details
+
 class contact(models.Model):
     name=models.CharField(max_length=100,default="kshh")
     email=models.CharField(max_length=100)
@@ -16,6 +19,9 @@ class contact(models.Model):
 
     def __str__(self):
         return self.name
+
+# 2 . Model for storing Teacher Details
+
 class Teacher_reg(models.Model):
     name=models.CharField(max_length=100,default="kshh")
     username=models.CharField(max_length=100,default="kshh")
@@ -26,6 +32,8 @@ class Teacher_reg(models.Model):
 
     def __str__(self):
         return self.name
+
+# 3 . Model for storing Student Details
 
 class Student_reg(models.Model):
     name=models.CharField(max_length=100)
@@ -38,6 +46,8 @@ class Student_reg(models.Model):
     def __str__(self):
         return self.name
 
+# 4 . Model for storing all Courses Details
+
 class Course(models.Model): 
     username=models.CharField(max_length=100) 
     course_name=models.CharField(max_length=100) 
@@ -48,6 +58,7 @@ class Course(models.Model):
     def __str__(self):
         return self.course_name
 
+# 5 . Model for storing Details of Courses whose attendance is Published and running live 
 
 class Live(models.Model):
     username=models.CharField(max_length=100)
@@ -68,6 +79,8 @@ class Live(models.Model):
     def __str__(self):
         return self.course_name
 
+# 6 . Model for storing Details of Courses whose attendance is Published and not running live 
+
 class Course_str(models.Model):
     username=models.CharField(max_length=100)
     course_name=models.CharField(max_length=100)
@@ -79,6 +92,8 @@ class Course_str(models.Model):
     
     def __str__(self):
         return self.course_name
+
+# 7 . Model for storing Details of Student and courses which are pending and yet not approved by Faculty.
 
 class Non_approved(models.Model):
     t_username=models.CharField(max_length=100)
@@ -93,6 +108,8 @@ class Non_approved(models.Model):
     def __str__(self):
         return self.course_name
 
+# 8 . Model for storing Details of Student and courses which are approved by Faculty. 
+
 class Approved(models.Model):
     t_username=models.CharField(max_length=100)
     t_name=models.CharField(max_length=100)
@@ -106,6 +123,7 @@ class Approved(models.Model):
     def __str__(self):
         return self.course_name
 
+ # 9 . Model for storing reports of Student's attendances .
 
 class Student_attendace_report(models.Model):
     t_username=models.CharField(max_length=100)
@@ -121,16 +139,21 @@ class Student_attendace_report(models.Model):
     def __str__(self):
         return self.course_name
 
+# 10 . Model for storing Variable value used in Opencv and face-recognition Model. 
+
 class Join(models.Model):
     username=models.CharField(max_length=100,primary_key=True)
     If_posted=models.IntegerField(default=0)
     Response_charge=models.IntegerField(default=0)
     course_name=models.CharField(max_length=100,default="")
 
+# 11 . Model for storing Variable value used in Opencv and face-recognition Model. 
+
 class recognize(models.Model):
     username=models.CharField(max_length=100,primary_key=True)
     If_posted=models.IntegerField(default=0)
     Response_charge=models.IntegerField(default=0)
+ 
 
 class Mains(models.Model):
     name=models.CharField(max_length=100,default="kshh")

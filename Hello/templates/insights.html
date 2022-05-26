@@ -26,7 +26,7 @@
           <th scope="row">{{ forloop.counter }}</th>
           <td>{{ i.date }}</td>
           <td>{{i.course_name}}</td>
-          <form action="/details" method="POST">{% csrf_token %}
+          <form action="/insights" method="POST">{% csrf_token %}
           <td><button name="detail" value="{{ i.time_present }}" class="btn btn-primary">Details</button></td></form>
         </tr>
         {% endfor %}

@@ -2,6 +2,8 @@
 {% block script %} <script src="/static/Js/courses.js"></script> {% endblock  %}
 {% block name %} {{ name }} {% endblock %}
 {% block style %} style="background-color:#F5F5F5;" {% endblock  %}
+{% block navlist2 %} btn btn-outline-secondary {% endblock  %} 
+
 {% block body %}
 
 
@@ -16,7 +18,7 @@
                 <div class="container"><h4>Course : {{course}}</h4></div>
                 <hr>
             <div class="form-group">
-              <label for="exampleInputPassword1">Active time</label><br> 
+              <label for="exampleInputPassword1">Active time duration</label><br> 
               <input type="number" class="form-control" name='time' id="exampleInputPassword1" placeholder="time in minutes" required >
             </div>
             <br>

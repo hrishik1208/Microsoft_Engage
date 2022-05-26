@@ -37,6 +37,12 @@ import glob
 import numpy as np
 from django.core.mail import send_mail
 
+
+#
+#   Login / Register Page code below
+#
+
+
 def index(request): 
     curr=request.user
     d=dict() 
@@ -54,6 +60,7 @@ def index(request):
         if User.objects.filter(username=username).exists() == False:
             messages.error(request,"Account does not exists")
             return redirect('/')
+
         c=User.objects.get(username=username)
         D=c.password
         print(D)
@@ -61,11 +68,13 @@ def index(request):
         if(D != password):
             messages.error(request,"Password Not Matched")
             return redirect('/')
+
         if Teacher_reg.objects.filter(username=username).exists():
             d["name"]=c.first_name
             if c is not None:
                 auth.login(request,c)
             return redirect('/teacher_page')
+
         else:
             d["name"]=c.first_name
             if c is not None:
@@ -78,28 +87,38 @@ def index(request):
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
-#  Teacher Part Below  ||
+#  Teacher's Side -> ||
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
-
+#
+# Teacher's Side  |=> Home page 
+#
 
 def teach(request):
     d=dict()
+
     if(request.method=="POST"):
         if len(request.user.username) !=0:
-            abcd=request.POST.get("hari")
-            print(abcd)
-            ob=Live.objects.filter(username=request.user.username,course_name=abcd)
+            course_name=request.POST.get("hari")
+            print(course_name)
+            ob=Live.objects.filter(username=request.user.username,course_name=course_name)
             ob.delete()
         else:
             name=request.POST.get('name')
             username=request.POST.get('username')
             email=request.POST.get('email')
+            comma=','
+            if comma in email:
+                messages.error(request,"Your email should not contain comma")
+                return render('/')
             password=request.POST.get('password')
             if User.objects.filter(username=username).exists():
                 messages.error(request,"Account with the username already exists")
+                return redirect('/')
+            if User.objects.filter(email=email).exists():
+                messages.error(request,"Account with the email already exists")
                 return redirect('/')
             else:
                 print("hayabuzza")
@@ -117,8 +136,6 @@ def teach(request):
     if Teacher_reg.objects.filter(username=request.user.username).exists() == False :
         return redirect('/')
 
-    
-
     active=Live.objects.filter(username=request.user.username)
     comments = Course_str.objects.filter(username=request.user.username)
     print("hola",comments)
@@ -126,6 +143,7 @@ def teach(request):
     for i in comments: 
         if i.username==request.user.username:
             past.append(i)
+
     sign=1
     a=round(time.time() * 1000)
     if len(active)==0:
@@ -135,6 +153,7 @@ def teach(request):
         sign=0
     else:
         sign=1
+
     f=request.user.first_name 
     d["name"]=f 
     d["sign"]=sign
@@ -143,8 +162,12 @@ def teach(request):
     d["past"]=past
     if sign==1:
         d['active']=active[0]
-    # print(active[0].course_name)
+
     return render(request,'teach_page.html',d) 
+
+#
+# Teacher's Side  |=> My Courses page 
+#
 
 def course(request): 
     if(len(request.user.username)==0):
@@ -162,7 +185,6 @@ def course(request):
         a=round(time.time() * 1000)
         location=request.POST.get('flexRadioDefault')
         print(location)
-        
         if len(l)>0:
             A=l[0]
             if A.time_future <= a:
@@ -212,6 +234,9 @@ def course(request):
     d["num"]=len(l)
     return render(request,'courses.html',d)
 
+#
+# Teacher's Side  |=> Create a course page 
+#
 
 
 def create(request): 
@@ -245,13 +270,69 @@ def create(request):
     d["name"]=c.first_name
     return render(request,'teach_create.html',d)
 
+#
+# Teacher's Side  |=> Records page of past attendance publishes
+#
+
+
 def insights(request):
     if(len(request.user.username)==0):
         return redirect('/')
 
     if Teacher_reg.objects.filter(username=request.user.username).exists() == False :
         return redirect('/')
-    d=dict()
+
+
+    d=dict() 
+    if request.method=="POST": 
+        present_time=request.POST.get('detail') 
+        object=Course_str.objects.filter(username=request.user.username,time_present=int(present_time)) 
+        final_attended=[] 
+        final_unattended=[] 
+        given=object[0].attended_list 
+        given=given.split("!!!!") 
+        data=Approved.objects.filter(t_username=request.user.username,course_name=object[0].course_name) 
+        email_list_unattended=""
+        Email_list_unattended=[]
+        for i in data: 
+            student_email=i.s_email 
+            student_id=i.s_id 
+            obb=Student_reg.objects.filter(email=student_email) 
+            student_name=obb[0].name  
+            if student_email in given: 
+                dictionary=dict() 
+                dictionary["name"]=student_name 
+                dictionary["email"]=student_email 
+                dictionary["id"]=student_id 
+                final_attended.append(dictionary) 
+            else: 
+                dictionary=dict() 
+                dictionary["name"]=student_name 
+                dictionary["email"]=student_email 
+                dictionary["id"]=student_id 
+                final_unattended.append(dictionary) 
+                if len(email_list_unattended)==0:
+                    email_list_unattended += student_email
+                else:
+                    email_list_unattended += ','+student_email
+
+                Email_list_unattended.append(student_email)
+
+ 
+        d["name"]=request.user.first_name 
+        d["final_attended"]=final_attended 
+        d["final_unattended"]=final_unattended 
+        d["course"]=object[0].course_name 
+        d["date"]=object[0].date 
+        d["No_of_attended"]=len(final_attended) 
+        d["No_of_unattended"]=len(final_unattended) 
+        d["total"]=len(final_attended)+len(final_unattended) 
+        d["list_email"]=email_list_unattended
+        d["List_email"]=Email_list_unattended
+        print(len(final_attended)) 
+        print(len(final_unattended)) 
+        return render(request,'detail.html',d) 
+        
     data=Course_str.objects.filter(username=request.user.username)
     d["name"]=request.user.first_name
     data1=[]
@@ -261,6 +342,11 @@ def insights(request):
     data1.reverse()
     d["data"]=data1
     return render(request,'insights.html',d)
+
+#
+# Teacher's Side  |=> Pending Requests page 
+#
+
 
 def Request(request):
     if(len(request.user.username)==0):
@@ -301,8 +387,11 @@ def Request(request):
     d["name"]=request.user.first_name
     d["sign"]=sign
     d["listt"]=listt
-    
     return render(request,'request.html',d)
+
+#
+# Teacher's Side |=> Detail page regarding the attendance in a course 
+#
 
 
 def details(request):
@@ -313,46 +402,26 @@ def details(request):
         return redirect('/')
 
     if request.method=="POST":
-        present_time=request.POST.get('detail')
-        object=Course_str.objects.filter(username=request.user.username,time_present=int(present_time))
-        final_attended=[]
-        final_unattended=[]
-        given=object[0].attended_list
-        given=given.split("!!!!")
-        data=Approved.objects.filter(t_username=request.user.username,course_name=object[0].course_name)
-        for i in data:
-            student_email=i.s_email
-            student_id=i.s_id
-            obb=Student_reg.objects.filter(email=student_email)
-            student_name=obb[0].name
-            if student_email in given:
-                dictionary=dict()
-                dictionary["name"]=student_name
-                dictionary["email"]=student_email
-                dictionary["id"]=student_id
-                final_attended.append(dictionary)
-            else:
-                dictionary=dict()
-                dictionary["name"]=student_name
-                dictionary["email"]=student_email
-                dictionary["id"]=student_id
-                final_unattended.append(dictionary)
+        email_list=request.POST.get('Emailto')
+        email_list=email_list.split(',')
+        print(email_list)
+        message=request.POST.get("message")
+        title=request.POST.get("title")
+        send_mail(
+            title,
+            message,
+            'attendance.portal.1234@gmail.com',
+            email_list,
+            fail_silently=False,
+        )
+        messages.success(request,"Message Sent Successfully")
+       
 
-        d=dict()
-        d["name"]=request.user.first_name
-        d["final_attended"]=final_attended
-        d["final_unattended"]=final_unattended
-        d["course"]=object[0].course_name
-        d["date"]=object[0].date
-        d["No_of_attended"]=len(final_attended)
-        d["No_of_unattended"]=len(final_unattended)
-        d["total"]=len(final_attended)+len(final_unattended)
-        print(len(final_attended))
-        print(len(final_unattended))
-        return render(request,'detail.html',d)
     return redirect('/insights')
 
-
+#
+# Teacher's Side |=> Page for Publishing the attendance of a course 
+#
 
 def publish(request):
     if(len(request.user.username)==0):
@@ -372,6 +441,10 @@ def publish(request):
     
     return redirect('/course')
 
+#
+# Teacher's Side |=> Detail page regarding Course, like students who are registered, their details,etc.
+#
+
 def course_details(request):
     if(len(request.user.username)==0):
         return redirect('/')
@@ -387,19 +460,26 @@ def course_details(request):
         data=Approved.objects.filter(t_username=request.user.username,course_name=c_name)
         d["name"]=request.user.first_name
         d["course"]=c_name
+        data_course=Course.objects.filter(username=request.user.username,course_name=c_name)
+        d["join_code"]=data_course[0].join_code
         final_data=[]
         for i in data:
             dictionary=dict()
             object=Student_reg.objects.filter(username=i.s_username)
             dictionary["name"]=object[0].name 
-            dictionary["id"]=i.s_id 
+            dictionary["id"]=i.s_id
             dictionary["user"]=i.s_username
             final_data.append(dictionary)
 
         d["data"]=final_data
+        d["lendata"]=len(final_data)
         return render(request,'course_details.html',d)
     
     return redirect('/course')
+
+#
+# Teacher's Side |=> Post method function created to delete particular student in a course 
+#
 
 def del_student(request):
     if(len(request.user.username)==0):
@@ -416,16 +496,51 @@ def del_student(request):
         print(user[0],user[1])
         if user[0] == "delete_all":
             li=Approved.objects.filter(t_username=request.user.username,course_name=user[1])
+            object_report=Student_attendace_report.objects.filter(t_username=request.user.username,course_name=user[1])
+            for i in object_report:
+                f=i
+                f.delete()
             count=0
             for i in range(0,len(li)):
                 count+=1
                 ob=li[i]
                 ob.delete()
             print("count is",count)
+        elif user[0] == "!!!!":
+            object1=Course.objects.filter(username=request.user.username,course_name=user[1])
+            object2=Live.objects.filter(username=request.user.username,course_name=user[1])
+            object3=Course_str.objects.filter(username=request.user.username,course_name=user[1])
+            object4=Non_approved.objects.filter(t_username=request.user.username,course_name=user[1])
+            object5=Approved.objects.filter(t_username=request.user.username,course_name=user[1])
+            object6=Student_attendace_report.objects.filter(t_username=request.user.username,course_name=user[1])
+
+            for i in object1:
+                dup=i
+                dup.delete()
+            for i in object2:
+                dup=i
+                dup.delete()
+            for i in object3:
+                dup=i
+                dup.delete()
+            for i in object4:
+                dup=i
+                dup.delete()
+            for i in object5:
+                dup=i
+                dup.delete()
+            for i in object6:
+                dup=i
+                dup.delete()
+            messages.success(request,"Course and all it's history has been deleted")
+            return redirect('/course')
         else:
-            li=Approved.objects.filter(t_username=request.user.username,s_username=user[0],course_name=user[1])
-            li[0].delete()
-        messages.success(request,"Student Removed")
+            list=Approved.objects.filter(t_username=request.user.username,s_username=user[0],course_name=user[1])
+            list[0].delete()
+            object_report=Student_attendace_report.objects.filter(t_username=request.user.username,s_username=user[0],course_name=user[1])
+            object_report[0].delete()
+
+        messages.success(request,"Student/s Removed")
         return redirect('/course')
     
     return redirect('/course')
@@ -440,6 +555,11 @@ def del_student(request):
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------
 
+#
+# Function for calculating the globe distabce between two points on Earth on the basis of latitudes and longitudes receieved from Geolocation Api.
+#
+
+
 def Calculate_globe_distance(a,b,c,d,radius):
     print(a,b)
     print(c,d)
@@ -447,7 +567,7 @@ def Calculate_globe_distance(a,b,c,d,radius):
     lon2 = radians(d)
     lat1 = radians(a)
     lat2 = radians(b)
-      
+    
     # Haversine formula
     dlon = lon2 - lon1
     dlat = lat2 - lat1
@@ -463,8 +583,10 @@ def Calculate_globe_distance(a,b,c,d,radius):
 
     return False
 
-If_posted=False
-Response_charge=False
+#
+# Student's Side |=> Student Home page and also MY accepted courses page
+#
+
 def stu(request): 
     
     d=dict()
@@ -487,9 +609,7 @@ def stu(request):
                         messages.error(request,"Your Current Location is out of the range which instructor had set In. So please Go to Class to mark it.")
                         return redirect('/')
 
-                global If_posted
-                If_posted=True
-                global Response_charge
+                
                 val1=recognize(username=request.user.username,If_posted=0,Response_charge=0)
                 count=0
                 val1=recognize(username=request.user.username,If_posted=1,Response_charge=0)
@@ -549,7 +669,14 @@ def stu(request):
             if User.objects.filter(username=username).exists():
                 messages.error(request,"Account with the username already exists")
                 return redirect('/')
+            if User.objects.filter(email=email).exists():
+                messages.error(request,"Account with the email already exists")
+                return redirect('/')
             else:
+                comma = ','
+                if comma in email:
+                    messages.error(request,"Email should not contain comma")
+                    return redirect('/')
                 con=Student_reg(name=name,email=email,username=username,password=password)
                 con.save()
                 user=User(username=username,email=email,password=password,first_name=name,last_name=name)
@@ -615,9 +742,10 @@ def stu(request):
     d["sign"]=sign
     return render(request,'stu_page.html',d)
 
-processing_imageno=0
-processing_imagenofake=0
 
+#
+# Student's Side |=> Join a course page
+#
 
 def join(request):
     if(len(request.user.username)==0):
@@ -628,10 +756,7 @@ def join(request):
 
     # if os.path.exists('media/H1.jpg'):
     #     print("Yes file is there")
-    global processing_imageno
-    processing_imageno=0
-    global processing_imagenofake
-    processing_imagenofake=0
+
     d=dict()
     if request.method=="POST":
         c_name=request.POST.get('coursename')
@@ -693,6 +818,11 @@ def join(request):
     messages.success(request,"Your image and Id no. will be processed to Instructor")
     return render(request,'join.html',d)
 
+#
+# Student's Side |=> Attendance Records page
+#
+
+
 def profile(request):
     if(len(request.user.username)==0):
         return redirect('/')
@@ -738,7 +868,15 @@ def profile(request):
     print(count_unattendance)
     return render(request,'profile.html',d)
 
-    
+
+#
+# Common Routes
+#
+
+#
+# Logout Post method for both Teacher ans student
+#
+
 
 def logout(request):
     user=request.user
@@ -746,8 +884,14 @@ def logout(request):
     return redirect('/')
 
 
+#
+# Face Capturing Model in opencv, mediapipe and Harrcascade files for sudents joining a course. 
+#
+
+
 detector = cv2.CascadeClassifier(r'haarcascade_frontalface_default.xml')
 hand_cascade=cv2.CascadeClassifier(r'aGest.xml')
+
 detectorf = FaceDetector()
 def gen(request):
     video = cv2.VideoCapture(0)
@@ -785,10 +929,19 @@ def gen(request):
         frame = jpeg.tobytes()
         yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
+#
+# Returns the output of above Method function to below function "Video_feed" to render it on Html Pages.
+#
 
 
 def video_feed(request):
     return StreamingHttpResponse(gen(request),content_type='multipart/x-mixed-replace; boundary=frame')
+
+
+#
+# Capturing as well as Recognizing Model of faces and Hands built in opencv, mediapipe and Harrcascade files for attending a class by the student. 
+#
+
 
 detectorh=HandDetector(detectionCon=0.8, maxHands=1)
 
@@ -820,8 +973,6 @@ def gen1(request):
                 x,y,w,h = all_faces[0]
                 val=recognize.objects.filter(username=request.user.username)
                 rgb_img1=cv2.cvtColor(frame_flip,cv2.COLOR_BGR2RGB)
-                global If_posted
-                global Response_charge
                 if val[0].If_posted == 1 and len(face_recognition.face_encodings(rgb_img1)) >0 and len(hands)>0 :
                     cv2.imwrite('media/'+str(request.user.username)+'trial.jpg', frame_flip)
                     val1=recognize(username=val[0].username,If_posted=0,Response_charge=1)
@@ -835,6 +986,11 @@ def gen1(request):
         frame = jpeg.tobytes()
         yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
+
+
+#
+# Returns the output of above Method function to below function "Video_feed_1" to render it on Html Pages.
+#
 
 def video_feed_1(request):
     return StreamingHttpResponse(gen1(request),content_type='multipart/x-mixed-replace; boundary=frame')

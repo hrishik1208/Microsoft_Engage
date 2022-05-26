@@ -1,15 +1,43 @@
 {% extends 'basic.html' %}
 
 {% block name %} {{ name }} {% endblock %}
-
+{% block navlist2 %} btn btn-outline-secondary {% endblock  %} 
 
 {% block body %}
 
 <div class="container">
-    <h3>Course : {{course}} </h3>
+  <center>
+  <div class="row">
+
+    <div class="col-lg-4 col-md-12 col-sm-12">
+      <h4>Course : {{course}}</h4>
+    </div>
+    <div class="col-lg-4 col-md-6 col-sm-6">
+      <h4>Join Code : {{join_code}}</h4>
+    </div>
+    <div class="col-lg-4 col-md-6 col-sm-6">
+     <form action="/del_student" method="POST">{% csrf_token %}<button class="btn btn-secondary" name="delete" value="!!!!+{{course}}" type="submit">Delete Course <i style="color:red;" class="fa fa-solid fa-close"></i></button></form>
+    </div>
+
+  </div>
+</center>
+</div>
+<hr>
+<div class="container">
+    <h3> </h3>
     <br>
-    
+
     <center>
+      {% if lendata == 0 %}
+      <div class="container">
+      <h4>
+      You have no registered Students
+    </h4></div>
+    {% else %}
+
+<div class="container">
+      <h4>Registered Students Accepted by You</h4></div>
+      <br>
     <table class="table">
         <thead>
           <tr style="background-color:#F5F5F5;">
@@ -34,6 +62,9 @@
     <form action="/del_student" method="POST" >{% csrf_token %}<button style="padding: 1%;" type="submit" class="btn btn-primary" value="delete_all+{{course}}" name="delete" >Delete  All<i class="fa-solid fa-delete-left"></i> </button></form>
 
 </center>
+    
+{% endif %}
+
 </div>
 {% endblock  %}
 

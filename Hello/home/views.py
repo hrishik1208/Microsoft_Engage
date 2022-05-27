@@ -63,8 +63,6 @@ def index(request):
 
         c=User.objects.get(username=username)
         D=c.password
-        print(D)
-        print(password)
         if(D != password):
             messages.error(request,"Password Not Matched")
             return redirect('/')
@@ -102,7 +100,6 @@ def teach(request):
     if(request.method=="POST"):
         if len(request.user.username) !=0:
             course_name=request.POST.get("hari")
-            print(course_name)
             ob=Live.objects.filter(username=request.user.username,course_name=course_name)
             ob.delete()
         else:
@@ -121,7 +118,6 @@ def teach(request):
                 messages.error(request,"Account with the email already exists")
                 return redirect('/')
             else:
-                print("hayabuzza")
                 con=Teacher_reg(name=name,email=email,username=username,password=password)
                 con.save()
                 user=User(username=username,email=email,password=password,first_name=name,last_name=name)
@@ -138,7 +134,6 @@ def teach(request):
 
     active=Live.objects.filter(username=request.user.username)
     comments = Course_str.objects.filter(username=request.user.username)
-    print("hola",comments)
     past=[] 
     for i in comments: 
         if i.username==request.user.username:
@@ -184,7 +179,6 @@ def course(request):
         Time=int(Time)
         a=round(time.time() * 1000)
         location=request.POST.get('flexRadioDefault')
-        print(location)
         if len(l)>0:
             A=l[0]
             if A.time_future <= a:
@@ -210,7 +204,6 @@ def course(request):
                 longitude=float(location[1])
                 radius=request.POST.get('radius')
             a=round(time.time() * 1000)
-            print(a)
             b=a
             a=a+((Time*60)*1000)
             hi=datetime.date.today()
@@ -222,11 +215,9 @@ def course(request):
             messages.success(request,"Attendance Published ")
 
     fg=datetime.date.today()
-    print(fg)
     c=request.user
     d["name"]=c.first_name
     l= Course.objects.filter(username=request.user.username)
-    print(len(l))
     d["list"]=l
     L=[1,2,3]
     d["H"]=L
@@ -329,8 +320,6 @@ def insights(request):
         d["total"]=len(final_attended)+len(final_unattended) 
         d["list_email"]=email_list_unattended
         d["List_email"]=Email_list_unattended
-        print(len(final_attended)) 
-        print(len(final_unattended)) 
         return render(request,'detail.html',d) 
         
     data=Course_str.objects.filter(username=request.user.username)
@@ -357,6 +346,7 @@ def Request(request):
 
     if request.method=="POST":
         s=request.POST.get('hari')
+        if_reject= "!!!!"
         if s == "Accept_all" :
             li=Non_approved.objects.filter(t_username=request.user.username)
             count=0
@@ -366,7 +356,14 @@ def Request(request):
                 ob1=Approved(t_username=request.user.username,t_name=ob.t_name,s_username=ob.s_username,s_email=ob.s_email,s_id=ob.s_id,course_name=ob.course_name,img=ob.img,join_code=ob.join_code)
                 ob1.save()
                 ob.delete()
-            print("count is",count)
+        elif if_reject in s :
+            s=s[4:]
+            s=s.split(',')
+            li=Teacher_reg.objects.filter(username=request.user.username)
+            con1=Non_approved.objects.filter(t_username=request.user.username,s_username=s[0],course_name=s[1])
+            con1.delete()
+            messages.success(request, 'Rejected')
+            return redirect('/Request')
         else:
             s=s.split(',')
             li=Teacher_reg.objects.filter(username=request.user.username)
@@ -374,7 +371,7 @@ def Request(request):
             con.save()
             con1=Non_approved.objects.filter(t_username=request.user.username,s_username=s[0],course_name=s[1])
             con1.delete()
-            print(s)
+        
         messages.success(request, 'Approved Successfully')
 
     listt=Non_approved.objects.filter(t_username=request.user.username)
@@ -382,7 +379,6 @@ def Request(request):
     if len(listt) ==0:
         sign=0
 
-    print(len(listt))
     d=dict()
     d["name"]=request.user.first_name
     d["sign"]=sign
@@ -404,7 +400,6 @@ def details(request):
     if request.method=="POST":
         email_list=request.POST.get('Emailto')
         email_list=email_list.split(',')
-        print(email_list)
         message=request.POST.get("message")
         title=request.POST.get("title")
         send_mail(
@@ -432,9 +427,7 @@ def publish(request):
 
     d=dict()
     if request.method=="POST":
-        print("Hi there")
         c_name=request.POST.get('Harry')
-        print(c_name)
         d["name"]=request.user.first_name
         d["course"]=c_name
         return render(request,'publish.html',d)
@@ -454,9 +447,7 @@ def course_details(request):
 
     d=dict()
     if request.method=="POST":
-        print("Hi there")
         c_name=request.POST.get('Harry')
-        print(c_name)
         data=Approved.objects.filter(t_username=request.user.username,course_name=c_name)
         d["name"]=request.user.first_name
         d["course"]=c_name
@@ -490,10 +481,8 @@ def del_student(request):
 
     d=dict()
     if request.method=="POST":
-        print("Hi there")
         user=request.POST.get('delete')
         user=user.split('+')
-        print(user[0],user[1])
         if user[0] == "delete_all":
             li=Approved.objects.filter(t_username=request.user.username,course_name=user[1])
             object_report=Student_attendace_report.objects.filter(t_username=request.user.username,course_name=user[1])
@@ -505,7 +494,6 @@ def del_student(request):
                 count+=1
                 ob=li[i]
                 ob.delete()
-            print("count is",count)
         elif user[0] == "!!!!":
             object1=Course.objects.filter(username=request.user.username,course_name=user[1])
             object2=Live.objects.filter(username=request.user.username,course_name=user[1])
@@ -561,8 +549,6 @@ def del_student(request):
 
 
 def Calculate_globe_distance(a,b,c,d,radius):
-    print(a,b)
-    print(c,d)
     lon1 = radians(c)
     lon2 = radians(d)
     lat1 = radians(a)
@@ -593,7 +579,6 @@ def stu(request):
     if(request.method=="POST"):
         if len(request.user.username) !=0:  
             hi=request.POST.get("krish")   
-            print(hi)
             hi=hi.split(',')
             objectt=Student_attendace_report.objects.filter(t_username=hi[0],s_username=request.user.username,course_name=hi[1],bool=0,time_present=int(hi[2]))
             objectt1=Student_attendace_report.objects.filter(t_username=hi[0],s_username=request.user.username,course_name=hi[1],bool=1,time_present=int(hi[2]))
@@ -602,7 +587,6 @@ def stu(request):
             else:
                 bool = int(hi[3])
                 if bool == 1:
-                    print("THIS is gone inside")
                     location=hi[7]
                     location=location.split('+')
                     if Calculate_globe_distance(float(hi[4]),float(location[0]),float(hi[5]),float(location[1]),float(hi[6])) == False:
@@ -689,19 +673,12 @@ def stu(request):
 
     a=round(time.time() * 1000)
     g=Live.objects.exclude(time_future__lt=a)
-
-    # print("lenght ",len(g))
     g1=Approved.objects.filter(s_username=request.user.username)
     final1=[]
     final2=[]
-    # print("leng",len(g))
-    # print("leng",len(g1))
     for i in g1:
-        # print(i.course_name,"hi")
         for j in g:
-            # print(j.course_name)
             if (str(j.username)==str(i.t_username)) and (str(j.course_name) == str(i.course_name)):
-                # print("REal",j.username)
                 if j not in final1:
                     final1.append(j)
                 if i not in final2:
@@ -715,7 +692,6 @@ def stu(request):
     f=request.user.first_name 
     list=Approved.objects.filter(s_username=request.user.username)
     
-    print("lenght ",len(final1))
     sign=1
     for i in final1:
         ob1=Student_attendace_report.objects.filter(t_username=i.username,s_username=request.user.username,course_name=i.course_name,date=i.date,bool=1,time_present=i.time_present)
@@ -738,7 +714,6 @@ def stu(request):
     d["name"]=f
     d["list"]=list
     
-    # print("lenght ",len(final1))
     d["sign"]=sign
     return render(request,'stu_page.html',d)
 
@@ -753,9 +728,6 @@ def join(request):
 
     if Student_reg.objects.filter(username=request.user.username).exists() == False :
         return redirect('/')
-
-    # if os.path.exists('media/H1.jpg'):
-    #     print("Yes file is there")
 
     d=dict()
     if request.method=="POST":
@@ -782,7 +754,6 @@ def join(request):
             messages.error(request,"You are already Registered ")
             return redirect('/')
         else:
-            print(g)
             
             val1=Join(username=request.user.username,If_posted=0,Response_charge=0,course_name=c_name)
             count=0
@@ -798,8 +769,6 @@ def join(request):
 
             li=Teacher_reg.objects.filter(username=g[0].username)
             li2=Student_reg.objects.filter(username=request.user.username)
-            # run(str(request.user.username)+str(li[0].username))
-            # print("This ihiowhuowhon",str(request.user.username)+str(li[0].username)+".jpg")
             st = request.user.username+'_imageno_0'
             img2=cv2.imread('media/'+str(request.user.username)+'_imageno_0'+str(c_name)+'.jpg')
             rgb_img2=cv2.cvtColor(img2,cv2.COLOR_BGR2RGB)
@@ -843,6 +812,8 @@ def profile(request):
         count_unattendance=0
         if len(object1)>0:
             dictionary=dict()
+            teachname=Teacher_reg.objects.filter(username=object.username)
+            dictionary["third"]=teachname[0].name
             dictionary["first"]=object
             given=object.attended_list
             given=given.split("!!!!")
@@ -864,8 +835,6 @@ def profile(request):
     d["num"]=len(final_list_of_courses)
     d["count_attendance"]=count_attendance
     d["count_unattendance"]=count_unattendance
-    print(count_attendance)
-    print(count_unattendance)
     return render(request,'profile.html',d)
 
 

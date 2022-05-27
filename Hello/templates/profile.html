@@ -49,17 +49,17 @@ function drawChart() {
   <table class="table">
     <thead>
       <tr style="background-color:#F5F5F5;">
-        <th scope="col">#</th>
         <th scope="col">Date</th>
+        <th scope="col">Instructor</th>
         <th scope="col">Course</th>
-        <th scope="col">Detail Insights</th>
+        <th scope="col">Insights</th>
       </tr>
     </thead>
     <tbody>
       {% for i in final_list_of_courses %}
       <tr>
-        <th scope="row">{{ forloop.counter }}</th>
-        <td>{{ i.first.date }}</td>
+        <th scope="row">{{ i.first.date }}</th>
+        <td>{{ i.third }}</td>
         <td>{{ i.first.course_name}}</td>
         {% if i.second == 1 %}
         <td> Attended <i style="color:green;" class="fa fa-solid fa-check"></i> </td>

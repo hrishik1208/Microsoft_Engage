@@ -12,12 +12,12 @@
         <img width="50%" src="static/images/thumb.jpg" alt=""></div></div>
      
       {% else %}
-      <div style="background-color:#F3F4F6;padding:3%;" class="col-md-11 col-sm-12">
+      <div style="background-color:#F3F4F6;padding:3%;width:90%;" class="col-md-11 col-sm-12">
         <div style="background-color:white;" class="container"><h3>
           <br>
           Pending Approvals
         </h3><br>
-      <table class="table">
+      <table style="width:90%;" class="table">
           <thead>
             <tr style="background-color:#F5F5F5;">
               <th scope="col">Course Name</th>
@@ -25,6 +25,7 @@
               <th scope="col">Student University Id no.</th>
               <th scope="col">Image of Student</th>
               <th scope="col">Accept</th>
+              <th scope="col">Reject</th>
             </tr>
             {% for i in listt %}
                  <tr>
@@ -37,16 +38,19 @@
                    <td>
                      <form action="/Request" method="POST">
                        {% csrf_token %}<button type="submit" class="btn btn-primary" value="{{ i.s_username }},{{ i.course_name }},{{ i.s_id }},{{ i.s_email }},{{ i.join_code }}" name="hari" >Accept</button></form></td>
+                  <td>
+                        <form action="/Request" method="POST">
+                          {% csrf_token %}<button type="submit" class="btn btn-danger" value="!!!!{{ i.s_username }},{{ i.course_name }},{{ i.s_id }},{{ i.s_email }},{{ i.join_code }}" name="hari" >Reject</button></form></td>
                  </tr>
                  
              {% endfor %}
           
           </thead>
     </table>
-    
+    <hr>
     <form action="/Request" method="POST">
       {% csrf_token %}<button type="submit" style="padding:1%" class="btn btn-primary" value="Accept_all" name="hari" >Accept ALL</button></form>
-
+<hr>
       {% endif %}
         
       

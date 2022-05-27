@@ -186,7 +186,7 @@ def course(request):
                 l=[]
 
         if len(l) > 0:
-                messages.error(request,"Already one class is going on you account. Please Finish accepting attendance to publish a new attendance ")
+                messages.error(request,"Already one class is going on you account. Please Stop accepting attendance to publish a new attendance ")
 
         elif Course.objects.filter(username=request.user.username,course_name=c_name).exists() == False:
             messages.error(request,"No such course name found with your account ")
@@ -713,7 +713,7 @@ def stu(request):
         
     d["name"]=f
     d["list"]=list
-    
+    d["Course_num"]=len(list)
     d["sign"]=sign
     return render(request,'stu_page.html',d)
 

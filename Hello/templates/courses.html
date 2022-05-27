@@ -22,7 +22,7 @@
               <h5 class="card-title"><u> Course No. {{ forloop.counter }} </u></h5>
               <div class="container"><h4 class="card-text" name="coursename">{{ i.course_name }}</h4></div><br>
               <div class="container">
-             <form action="/publish" method="POST">{% csrf_token %} <button type="submit" value="{{i.course_name}}" name="Harry" class="btn btn-primary">Publish Attendance</button></form>
+             <form action="/publish" method="POST">{% csrf_token %} <button type="submit" value="{{i.course_name}}" name="Harry" class="btn btn-primary">Start Attendance</button></form>
               <br>
               <form action="/course_details" method="POST">{% csrf_token %}<button style="margin-top:-10px;" type="submit" value="{{i.course_name}}" name="Harry" class="btn btn-primary">Details</button></form>
             </div>

@@ -12,6 +12,7 @@ from home.models import Approved
 from home.models import Student_attendace_report
 from home.models import recognize
 from home.models import Join
+from home.models import mapping
 # Register your models here.
 
 admin.site.register(contact)
@@ -26,3 +27,4 @@ admin.site.register(Approved)
 admin.site.register(Student_attendace_report)
 admin.site.register(recognize)
 admin.site.register(Join)
+admin.site.register(mapping)

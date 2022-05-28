@@ -13,8 +13,35 @@
 {% endif %}
 
 {% if sign == 1 %}
-<hr>
 <center><h2>Live attendance Published</h2></center><br>
+{% if final1.bool == 1 %}
+<center> <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal0">
+  Location Required  <i class="	fa fa-bell"></i>
+</button>
+<br></center>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal0" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Check location</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container">Max distance range set by Instructor is {{final1.radius}} metres</div><br>
+        <div id="map"></div><br>
+        <div id="final" class="container">Range set by Instructor is</div> <div id="replaceme1">{{final1.latitude}}</div><div id="replaceme2">{{final1.longitude}}</div><br>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+
+<br>
 <div style="margin-right:10%;" class="container">
   <div style="border: 2px solid black;" class="row">
     <div class="col-4">
@@ -48,8 +75,32 @@
   </div>
 </div>
 
-{% if final1.bool == 1 %}
+
+
 <script>
+  document.getElementById("map").style.height = "400px";
+  function toRad(Value) 
+    {
+        return Value * Math.PI / 180;
+    }
+  function calcCrow(lat1, lon1, lat2, lon2) 
+    {
+      var R = 6371; // km
+      var dLat = toRad(lat2-lat1);
+      var dLon = toRad(lon2-lon1);
+      var lat1 = toRad(lat1);
+      var lat2 = toRad(lat2);
+
+      var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+      var d = R * c;
+      d = d*1000;
+      return d;
+    }
+
+    // Converts numeric degrees to radians
+    
   if('geolocation' in navigator){
     navigator.geolocation.getCurrentPosition(position=>{
       var latitude=position.coords.latitude;
@@ -62,7 +113,39 @@
       var d = Myelement
       var t= d.concat(",",v);
       document.getElementById("query").value = t;
-      console.log(t)
+      var lats=document.getElementById("replaceme1").innerHTML;
+      var lons=document.getElementById("replaceme2").innerHTML;
+      var latf=parseFloat(lats);
+      var lonf=parseFloat(lons);
+      console.log(latf)
+      console.log(lonf)
+      var distance = calcCrow(latitude,longitude,latf,lonf);
+      document.getElementById("final").innerHTML = ' Your distance from Instructor is '+ distance +' metres';
+      document.getElementById("replaceme1").innerHTML = ''
+      document.getElementById("replaceme2").innerHTML = ''
+      console.log(distance)
+      var options = {
+        center: {lat:latitude,lng:longitude},
+        zoom:13
+      }
+
+    var map = new google.maps.Map(document.getElementById('map'),options);
+
+    var markerOptions={
+        position: new google.maps.LatLng(latitude,longitude),
+        map: map
+    }
+
+    var marker= new google.maps.Marker(markerOptions)
+
+    var markerOptions1={
+      position: new google.maps.LatLng(latf,lonf),
+      icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+      map: map
+  }
+
+  var marker= new google.maps.Marker(markerOptions1)
+
       },error=>{
       alert("Please allow location");
     });
@@ -71,10 +154,9 @@
     alert("Not Supported");
   }
 </script>
+<script  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCjIW074C0g8UlUxBGsYlxzhE1T2kKyFaU"></script>
 
-
-
-{% endif %}
+<!--Enifk -->
 <script>
   function typescript(){
     var a=document.getElementById("takeaction")
@@ -87,7 +169,6 @@
 {% endif %}
 <script> 
   var i = document.getElementById('val').innerHTML; 
-  console.log(i); 
   document.getElementById("val").innerHTML = ""; 
   var x=setInterval(function(){ 
   var now =new Date().getTime();
@@ -105,31 +186,13 @@
   }
   var fin=str.concat(" : ",str1);
   document.getElementById("val").innerHTML = fin;
-  console.log(fin);
+
   if (num <=0 && num1<=0){
     location.href = "/student_page";
   }
 }, 1000 )
 </script>
 
-<br><center><hr><h3 style="font-style:italic;">You have registered in <u>{{Course_num}}</u> Courses</h3></center><br>
-<div class="container">
-    <div class="row">
-      {% for i in list  %}
-        <div style="padding:30px;" class="col-md-4 col-sm-6">
-        <div style="background-color:#F5F5F5;" class="card" style="width: 18rem;">
-            <center>
-            
-            <div class="card-body">
-              <div class="container"><h4>Course No. {{ forloop.counter }} </h4> </div>
-              <h5 class="card-title">{{ i.course_name }} </h5>
-              <p class="card-text" name="coursename">Instr. {{ i.t_name }}</p>
-            </div></center>
-        </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
 <hr>
 
 {% endblock  %}

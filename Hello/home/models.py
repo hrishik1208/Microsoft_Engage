@@ -155,6 +155,15 @@ class recognize(models.Model):
     Response_charge=models.IntegerField(default=0)
  
 
+# 12 . Model for mapping course join code and Course name.
+
+class mapping(models.Model):
+
+    join_code=models.IntegerField(default=0)
+    Course_name=models.CharField(max_length=100)
+ 
+
+
 class Mains(models.Model):
     name=models.CharField(max_length=100,default="kshh")
     img=models.ImageField(null=True,blank=True)

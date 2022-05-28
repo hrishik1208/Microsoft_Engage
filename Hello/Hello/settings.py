@@ -41,7 +41,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'Hello.urls'
-
+Haryybolik = "qodtazpahnedbjvo"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -70,7 +70,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
+PIKACHYUY = Haryybolik
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -102,6 +102,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+Hats= PIKACHYUY
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -125,4 +126,4 @@ EMAIL_HOST_USER = 'attendance.portal.1234@gmail.com'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_PASSWORD = "Myashraya1505"
+EMAIL_HOST_PASSWORD = Hats

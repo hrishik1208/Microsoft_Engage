@@ -22,6 +22,8 @@ from home.models import Approved
 from home.models import Student_attendace_report
 from home.models import recognize
 from home.models import Join
+from home.models import mapping
+
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
 from cvzone.HandTrackingModule import HandDetector
@@ -212,18 +214,18 @@ def course(request):
             gi=0
             m2=Course_str(username=request.user.username,course_name=c_name,date=hi,time_present=b,attended_list="")
             m2.save()
-            messages.success(request,"Attendance Published ")
+            messages.success(request,"Attendance Published ") 
 
-    fg=datetime.date.today()
-    c=request.user
-    d["name"]=c.first_name
-    l= Course.objects.filter(username=request.user.username)
-    d["list"]=l
-    L=[1,2,3]
-    d["H"]=L
+    fg=datetime.date.today() 
+    c=request.user 
+    d["name"]=c.first_name 
+    l= Course.objects.filter(username=request.user.username) 
+    d["list"]=l 
+    L=[1,2,3] 
+    d["H"]=L 
     d["y"]=range(0,len(l)) 
-    d["num"]=len(l)
-    return render(request,'courses.html',d)
+    d["num"]=len(l) 
+    return render(request,'courses.html',d) 
 
 #
 # Teacher's Side  |=> Create a course page 
@@ -240,11 +242,9 @@ def create(request):
     d=dict()
     if(request.method=="POST"):
         c_name=request.POST.get('coursename')
-        code=request.POST.get('code')
         
-        if len(code) != 4:
-            messages.error(request,"The Join Code should be a 4 digit number")
-        elif Course.objects.filter(course_name=c_name,username=request.user.username).exists():
+        radio=request.POST.get("flexRadioDefault")
+        if Course.objects.filter(course_name=c_name,username=request.user.username).exists():
             c=request.user
             d["name"]=c.first_name
             c=c.username
@@ -253,9 +253,30 @@ def create(request):
             c=request.user
             d["name"]=c.first_name
             c=c.username
-            us=Course(username=c,course_name=c_name,join_code=code)
+            len_course=Course.objects.filter()
+            len_course=len(len_course)*10 + 111111  
+            us=Course(username=c,course_name=c_name,join_code= len_course)
             us.save()
-            messages.success(request,"The course is registered successfully")
+            mapping_object=mapping(join_code=len_course,Course_name=c_name)
+            if radio == "noemail":
+                email=request.POST.get('email')
+                email=email.split(',')
+                teacher_info=User.objects.filter(username=request.user.username)
+                message="Hello Student, Kindly join the course - " +str(c_name) +" with the join code "+str(len_course)+"\n \n Your Instructor," + "\n " + str(teacher_info[0].first_name) 
+                title="Kindly Join the course"
+                send_mail(
+                    title,
+                    message,
+                    'attendance.portal.1234@gmail.com',
+                    email,
+                    fail_silently=False,
+                )
+                messages.success(request,"The course is registered successfully and mails to students for joining the course has also been sent.")
+                return redirect('/course')
+            else:
+                messages.success(request,"The course is registered successfully")
+                return redirect('/course')
+            return redirect('/course')
     
     c=request.user
     d["name"]=c.first_name
@@ -400,7 +421,8 @@ def details(request):
     if request.method=="POST":
         email_list=request.POST.get('Emailto')
         email_list=email_list.split(',')
-        message=request.POST.get("message")
+        teacher_info=User.objects.filter(username=request.user.username)
+        message=request.POST.get("message") +"\n \n Your Instructor," + "\n " + str(teacher_info[0].first_name) 
         title=request.POST.get("title")
         send_mail(
             title,
@@ -690,7 +712,7 @@ def stu(request):
     if Student_reg.objects.filter(username=request.user.username).exists() == False :
         return redirect('/')
     f=request.user.first_name 
-    list=Approved.objects.filter(s_username=request.user.username)
+    
     
     sign=1
     for i in final1:
@@ -712,10 +734,28 @@ def stu(request):
         d["final1"]=final1[0]
         
     d["name"]=f
-    d["list"]=list
-    d["Course_num"]=len(list)
     d["sign"]=sign
     return render(request,'stu_page.html',d)
+
+
+
+#
+# Student's Side |=> My Courses page
+#
+
+def my_course(request):
+    if(len(request.user.username)==0):
+        return redirect('/')
+
+    if Student_reg.objects.filter(username=request.user.username).exists() == False :
+        return redirect('/')
+
+    d=dict()
+    list=Approved.objects.filter(s_username=request.user.username) 
+    d["name"]=request.user.first_name
+    d["list"]=list
+    d["Course_num"]=len(list)
+    return render(request,'mycourses.html',d)
 
 
 #
@@ -731,28 +771,29 @@ def join(request):
 
     d=dict()
     if request.method=="POST":
-        c_name=request.POST.get('coursename')
+        # c_name=request.POST.get('coursename')
         code=request.POST.get('code')
         id=request.POST.get('id')
-        if len(code) != 4:
-            messages.error(request,"The Join Code should be a 4 digit number")
+        c_name=mapping.objects.filter(join_code=code)
+        if len(c_name)==0:
+            messages.error(request,"No Course found with the given join code. Please try again! ")
             return redirect('/')
+        c_name=c_name[0].Course_name
         g=Course.objects.filter(course_name=c_name,join_code=code)
         g1=Non_approved.objects.filter(course_name=c_name,join_code=code,s_username=request.user.username)
         My_record=Approved.objects.filter(course_name=c_name,join_code=code,s_id=id)
         g2=Approved.objects.filter(course_name=c_name,join_code=code,s_username=request.user.username)
-        if len(g)==0:
-            messages.error(request,"No Instructor found with the given course and join code. Please try again! ")
-            return redirect('/')
-        elif len(g1) !=0:
+        
+        if len(g1) !=0:
             messages.error(request,"Request to Instructor has already been sent by your account previously. ")
-            return redirect('/')
-        elif len(My_record) !=0:
-            messages.error(request,"One student is already registered in the same course with the Id no. you provided.")
             return redirect('/')
         elif len(g2) !=0:
             messages.error(request,"You are already Registered ")
             return redirect('/')
+        elif len(My_record) !=0:
+            messages.error(request,"One student is already registered in the same course with the Id no. you provided.")
+            return redirect('/')
+       
         else:
             
             val1=Join(username=request.user.username,If_posted=0,Response_charge=0,course_name=c_name)

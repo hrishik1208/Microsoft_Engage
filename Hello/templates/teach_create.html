@@ -5,28 +5,60 @@
 
 <br>
 <hr>
-<br><br><br>
+
 <center>
+  <div style="width:100%;padding:2%;background-color:#F5F5F5;" class="container">
     <div class="container" style="width: 50%;font-size: 20px;">
         <div class="card card-body">
           <!-- Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger. -->
           <form  action='/create' method ="POST">
               {% csrf_token %}
             <div class="form-group">
-              <label for="exampleInputEmail1">Course Name</label><br> 
-              <input type="text" name='coursename' class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Eg: Introduction To Programming" required>
+              <label for="exampleInputEmail1"><strong><u> Course Name </u></strong></label><br> <br>
+              <input style="margin-top:-10px;" type="text" name='coursename' class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Eg: Introduction To Programming" required>
               <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
             </div><br>
             <div class="form-group">
-              <label for="exampleInputPassword1">Course Join Code</label><br> 
-              <input type="text" class="form-control" name='code' id="exampleInputPassword1" placeholder="4-digit code" required >
-            </div>
+              <div class="form-check">
+                
+                <input class="form-check-input" value="noemail" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onclick="fun2()" >
+                <label class="form-check-label" for="flexRadioDefault"> 
+                <strong> <u> I want to send this join code to students Now  </u> </strong>
+                </label><br> <br>
+                <div >
+                  <textarea rows="2" class="form-control" name="email" value="email" id="Fun2" type="text" placeholder="Email" required ></textarea>
+                </div>
+              </div>
+              <hr>
+              <div class="form-check">
+                <input value="onboard" class="form-check-input" type="radio" name="flexRadioDefault" onclick="fun1()" id="flexRadioDefault2" checked >
+                <label style="margin-left:-5%;" class="form-check-label" for="flexRadioDefault">
+                <strong> <u> Not Now</u> </strong> <br>
+                </label>
+              </div>
+             </div>
             <br>
             <button  id="hari" data-bs-toggle="collapse" data-bs-target="#collapseExample" type="submit" class="btn btn-primary">Create</button>
           </form>
+          <script>
+            document.getElementById("Fun2").disabled = true;
+            function fun1(){
+              response=0;
+              document.getElementById("Fun2").disabled = true;
+  
+            }
+          
+          
+            function fun2(){
+                  document.getElementById("Fun2").disabled = false;
+            }
+
+          </script>
         </div>
       </div>
+    </div>
 </center>
+<br><br>
 <hr>
 
 {% endblock  %}

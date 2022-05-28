@@ -1,0 +1,27 @@
+{% extends 'boiler2.html' %}
+{% block name %} {{ name }} {% endblock %}
+{% block navlist2 %} btn btn-outline-secondary {% endblock  %}
+{% block body %}
+
+
+<br><center><hr><h3 style="font-style:italic;">You have registered in <u>{{Course_num}}</u> Courses</h3></center><br>
+<div class="container">
+    <div class="row">
+      {% for i in list  %}
+        <div style="padding:30px;" class="col-md-4 col-sm-6">
+        <div style="background-color:#F5F5F5;" class="card" style="width: 18rem;">
+            <center>
+            
+            <div class="card-body">
+              <div class="container"><h4>Course No. {{ forloop.counter }} </h4> </div>
+              <h5 class="card-title">{{ i.course_name }} </h5>
+              <p class="card-text" name="coursename">Instr. {{ i.t_name }}</p>
+            </div></center>
+        </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<hr>
+
+{% endblock  %}

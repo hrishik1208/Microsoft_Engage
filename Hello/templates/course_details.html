@@ -44,7 +44,7 @@
             <th scope="col">#</th>
             <th scope="col">Name</th>
             <th scope="col">Id No.</th>
-            <th scope="col">Delete</th>
+            <th scope="col">Remove</th>
           </tr>
         </thead>
         <tbody>
@@ -53,13 +53,13 @@
             <th scope="row">{{ forloop.counter }}</th>
             <td>{{ i.name }}</td>
             <td>{{i.id}}</td>
-            <td><form action="/del_student" method="POST" >{% csrf_token %}<button type="submit" class="btn btn-secondary" value="{{ i.user }}+{{course}}" name="delete" >Delete <i class="fa fa-solid fa-delete-left"></i> </button></form></td>
+            <td><form action="/del_student" method="POST" >{% csrf_token %}<button type="submit" class="btn btn-secondary" value="{{ i.user }}+{{course}}" name="delete" >Remove <i class="fa fa-solid fa-delete-left"></i> </button></form></td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     
-    <form action="/del_student" method="POST" >{% csrf_token %}<button type="submit" class="btn btn-primary" value="delete_all+{{course}}" name="delete" >Delete  All Students <i class="fa fa-solid fa-delete-left"></i> </button></form>
+    <form action="/del_student" method="POST" >{% csrf_token %}<button type="submit" class="btn btn-primary" value="delete_all+{{course}}" name="delete" >Remove all Students <i class="fa fa-solid fa-delete-left"></i> </button></form>
 
 </center>
     

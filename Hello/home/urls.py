@@ -11,6 +11,7 @@ urlpatterns = [
     path('teacher_page',views.teach, name='teach'),
     path('student_page',views.stu, name='stu'),
     path('create',views.create, name='create'),
+    path('my_course',views.my_course, name='my_course'),
     path('course',views.course, name='course'),
     path('Request',views.Request, name='Request'),
     path('insights',views.insights, name='insights'),

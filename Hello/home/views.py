@@ -179,6 +179,9 @@ def course(request):
         c_name=request.POST.get('course_name')
         Time=request.POST.get('time')
         Time=int(Time)
+        if Time < 0:
+            messages.error(request,"Time should be positive")
+            return redirect('/course')
         a=round(time.time() * 1000)
         location=request.POST.get('flexRadioDefault')
         if len(l)>0:
@@ -205,6 +208,10 @@ def course(request):
                 latitude=float(location[0])
                 longitude=float(location[1])
                 radius=request.POST.get('radius')
+            radius = int(radius)
+            if radius < 0:
+                messages.error(request,"Radius distance should be positive")
+                return redirect('/course')
             a=round(time.time() * 1000)
             b=a
             a=a+((Time*60)*1000)
@@ -255,6 +262,10 @@ def create(request):
             c=c.username
             len_course=generatec.objects.filter()
             lent=0
+            comma = ','
+            if comma in c_name:
+                messages.error(request,"Your Course name should not contain any comma")
+                return redirect('/create')
             if len(len_course) == 0:
                 len_course=generatec(len=1)
                 len_course.save()

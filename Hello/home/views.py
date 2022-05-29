@@ -125,7 +125,7 @@ def teach(request):
                 user=User(username=username,email=email,password=password,first_name=name,last_name=name)
                 user.save() 
                 if user is not None: 
-                    messages.success(request,"Registered Succsessfully") 
+                    messages.success(request,"Registered Successfully") 
                     auth.login(request,user) 
                     
     if(len(request.user.username)==0):
@@ -524,7 +524,8 @@ def del_student(request):
             object4=Non_approved.objects.filter(t_username=request.user.username,course_name=user[1])
             object5=Approved.objects.filter(t_username=request.user.username,course_name=user[1])
             object6=Student_attendace_report.objects.filter(t_username=request.user.username,course_name=user[1])
-
+            mapping_object=mapping.objects.filter(Course_name=user[1])
+            mapping_object.delete()
             for i in object1:
                 dup=i
                 dup.delete()

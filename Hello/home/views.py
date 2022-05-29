@@ -23,7 +23,7 @@ from home.models import Student_attendace_report
 from home.models import recognize
 from home.models import Join
 from home.models import mapping
-
+from home.models import generatec
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
 from cvzone.HandTrackingModule import HandDetector
@@ -253,8 +253,18 @@ def create(request):
             c=request.user
             d["name"]=c.first_name
             c=c.username
-            len_course=Course.objects.filter()
-            len_course=len(len_course)*10 + 111111  
+            len_course=generatec.objects.filter()
+            lent=0
+            if len(len_course) == 0:
+                len_course=generatec(len=1)
+                len_course.save()
+                lent=1
+            else:
+                lent=len(len_course)+1
+                len_course=generatec(len=lent)
+                len_course.save()
+        
+            len_course=(lent)*10 + 111111
             us=Course(username=c,course_name=c_name,join_code= len_course)
             us.save()
             mapping_object=mapping(join_code=len_course,Course_name=c_name)

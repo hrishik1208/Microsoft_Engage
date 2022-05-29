@@ -13,6 +13,7 @@ from home.models import Student_attendace_report
 from home.models import recognize
 from home.models import Join
 from home.models import mapping
+from home.models import generatec
 # Register your models here.
 
 admin.site.register(contact)
@@ -28,3 +29,4 @@ admin.site.register(Student_attendace_report)
 admin.site.register(recognize)
 admin.site.register(Join)
 admin.site.register(mapping)
+admin.site.register(generatec)

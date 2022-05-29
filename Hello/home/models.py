@@ -162,6 +162,10 @@ class mapping(models.Model):
     join_code=models.IntegerField(default=0)
     Course_name=models.CharField(max_length=100)
  
+# 13. Model for generating 6-digit random code
+
+class generatec(models.Model):
+    len = models.IntegerField(default=1,primary_key=True)
 
 
 class Mains(models.Model):

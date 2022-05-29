@@ -258,6 +258,7 @@ def create(request):
             us=Course(username=c,course_name=c_name,join_code= len_course)
             us.save()
             mapping_object=mapping(join_code=len_course,Course_name=c_name)
+            mapping_object.save()
             if radio == "noemail":
                 email=request.POST.get('email')
                 email=email.split(',')

@@ -190,7 +190,7 @@ def course(request):
                 A.delete()
                 l=[]
 
-        if len(l) > 0:
+        if len(l) > 0:   
                 messages.error(request,"Already one class is going on you account. Please Stop accepting attendance to publish a new attendance ")
 
         elif Course.objects.filter(username=request.user.username,course_name=c_name).exists() == False:

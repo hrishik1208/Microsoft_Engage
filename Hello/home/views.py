@@ -546,9 +546,11 @@ def del_student(request):
             return redirect('/course')
         else:
             list=Approved.objects.filter(t_username=request.user.username,s_username=user[0],course_name=user[1])
-            list[0].delete()
+            if len(list)>0:
+                list[0].delete()
             object_report=Student_attendace_report.objects.filter(t_username=request.user.username,s_username=user[0],course_name=user[1])
-            object_report[0].delete()
+            if len(object_report) !=0:
+                object_report[0].delete()
 
         messages.success(request,"Student/s Removed")
         return redirect('/course')

@@ -1,5 +1,5 @@
-Attendance Portal
-This project uses the library like opencv mediapipe cvzone,etc. Django is used as a backen framework in this project. Users are able to signup and login to their account. Teachers are able to create courses. Students are join the courses.
+Attendance Portal :->
+This project uses the libraries like opencv mediapipe cvzone,etc. Django is used as a backend framework in this project. Users are able to signup and login to their account. Teachers are able to create courses. Students are able to join the courses.
 
 Note: this prototype is only made for Universities and colleges as it includes verification and identification of students by administration.
 
@@ -34,7 +34,7 @@ Features
 
 Teacher side :->
 
-1.  Can create a Course and can automatically send invite main with join code to students for that course.
+1.  Can create a Course and can automatically send invite mail with join code to students for that course.
 
 2.  Can delete a course and all it’s history.
 

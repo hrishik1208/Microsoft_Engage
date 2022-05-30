@@ -86,7 +86,7 @@ Authentication (signup, login, logout)
 
 <hr>
 
-How to run Github source code in localhost (python version=> Python 3.9.0)
+How to run Github source code in localhost (python version=> Python 3.9.0) (preferred Windows)
 
 1. Clone the github repository
 
@@ -108,6 +108,7 @@ b. cd Microsoft_Engage
 c. cd Hello
 
 d. pip install –r requirements.txt 
+
     /** Alternative:=> pip install  django opencv-python cmake dlib face-recognition cvzone mediapipe numpy
 
 e. python manage.py runserver

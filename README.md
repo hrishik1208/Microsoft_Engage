@@ -107,7 +107,7 @@ b. cd Microsoft_Engage
 
 c. cd Hello
 
-d. pip install –r requirements.txt 
+d. pip install -r requirements.txt 
 
     /** Alternative:=> pip install  django opencv-python cmake dlib face-recognition cvzone mediapipe numpy
 

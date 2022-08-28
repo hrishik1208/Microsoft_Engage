@@ -10,7 +10,6 @@ This data will be sent to Pending request section on respective Instructor’s  
 
 <hr>
 Demo Video
-Youtube: https://youtu.be/iMnCIT0iKfk
 
 Drive: https://drive.google.com/file/d/1KVtR1j4G2VLMyefVszeApLYBScP6rGxA/view?usp=sharing
 <hr>
@@ -116,6 +115,8 @@ e. python manage.py runserver
 
 <hr>
 Contact Details
-Name: Hrishik Kanade Email: ashihrishik@gmail.com
+Name: Hrishik Kanade 
+
+Email: ashihrishik@gmail.com
 
 

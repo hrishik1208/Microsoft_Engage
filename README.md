@@ -91,7 +91,7 @@ How to run Github source code in localhost (python version=> Python 3.9.0) (pref
 
 2. Move into Microsoft_Engage directory
 
-3. Move into Hello Directory
+3. Move into Attendance_Portal Directory
 
 4. Install all dependencies
 
@@ -104,7 +104,7 @@ a. git clone https://github.com/hrishik1208/Microsoft_Engage
 
 b. cd Microsoft_Engage
 
-c. cd Hello
+c. cd Attendance_Portal
 
 d. pip install -r requirements.txt 
 

@@ -40,7 +40,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Hello.urls'
+ROOT_URLCONF = 'Attendance_Portal.urls'
 Haryybolik = "qodtazpahnedbjvo"
 TEMPLATES = [
     {
@@ -58,7 +58,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Hello.wsgi.application'
+WSGI_APPLICATION = 'Attendance_Portal.wsgi.application'
 
 
 # Database
